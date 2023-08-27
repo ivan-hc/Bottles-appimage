@@ -21,3 +21,6 @@ This repository creates and distributes the unofficial Appimage of Bottles built
 
 # Sources
 This "ArchImage" is built from AUR, package's source at https://aur.archlinux.org/packages/bottles
+
+# Disclaim
+Due to upstream developers of Bottles (see https://github.com/bottlesdevs/Bottles/issues/2947#issuecomment-1668762231) this project will remain a third party project, so take this as an experimental attempt to bring back the AppImage of Bottles, not a final solution.
