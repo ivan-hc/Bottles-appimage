@@ -3,7 +3,7 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="procps-ng pipewire pulseaudio tar"
+DEPENDENCES="procps-ng pipewire pulseaudio python-yaml tar lib32-vkd3d lib32-vulkan-icd-loader vkd3d vulkan-icd-loader"
 BASICSTUFF="base-devel binutils gzip"
 #COMPILERS="gcc"
 
@@ -60,7 +60,7 @@ sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
 ./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS $DEPENDENCES")
 ./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
 echo y | ./.local/share/junest/bin/junest -- yay --answerclean All --answerdiff All --noconfirm -S $APP
-
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Rcns gcc
 
 # SET THE LOCALE (DON'T TOUCH THIS)
 #sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
@@ -97,12 +97,21 @@ cat >> ./AppRun << 'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
-export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"
+export __EGL_VENDOR_LIBRARY_DIRS=/etc/glvnd/egl_vendor.d/:/usr/share/glvnd/egl_vendor.d/
+export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/*
+export BOTTLES_RUNTIME_PATH=$HOME/.local/share/bottles/runtimes/runtime/
+export GLPATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/:/usr/lib/
+export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"
+export LIBVA_DRIVERS_PATH=/lib/x86_64-linux-gnu/dri/
+export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/*
+export VULKAN_DEVICE_INDEX=1
+export VULKAN_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/:/usr/lib/
 export JUNEST_HOME=$HERE/.junest
 export PATH=$HERE/.local/share/junest/bin/:$PATH
 mkdir -p $HOME/.cache
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" 2> /dev/null -- $EXEC "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" -- $EXEC "$@"
+rm -R -f $HOME/.local/share/bottles/temp/*
 EOF
 chmod a+x ./AppRun
 
@@ -294,4 +303,4 @@ mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION""$VERSIONAUR"-archimage2.1-4-alpha1-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION""$VERSIONAUR"-archimage2.1-4-alpha2-x86_64.AppImage
