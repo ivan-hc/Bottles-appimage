@@ -3,7 +3,7 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="cabextract ca-certificates faudio gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libglvnd libnotify libva mesa p7zip pipewire procps-ng pulseaudio python python-yaml tar vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-radeon vulkan-swrast vulkan-tools vulkan-utility-libraries vulkan-virtio wine winetricks xorg-xdpyinfo zimg"
+DEPENDENCES="cabextract ca-certificates faudio gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mesa-utils lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libglvnd libnotify libva mesa mesa-utils p7zip pipewire procps-ng pulseaudio python python-yaml tar vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-radeon vulkan-swrast vulkan-tools vulkan-utility-libraries vulkan-virtio wine winetricks xorg-xdpyinfo zimg"
 VIRTDEPS="libepoxy qemu-common qemu-vhost-user-gpu qemu-hw-display-virtio-gpu-gl virglrenderer"
 BASICSTUFF="binutils gzip"
 COMPILERS="base-devel"
@@ -44,9 +44,9 @@ Include = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 #Include = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 
 # CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
-COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
-rm -R ./.junest/etc/pacman.d/mirrorlist
-wget -q https://archlinux.org/mirrorlist/?country="$(echo "$COUNTRY")" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
+#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
+#rm -R ./.junest/etc/pacman.d/mirrorlist
+#wget -q https://archlinux.org/mirrorlist/?country="$(echo "$COUNTRY")" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
 
 # BYPASS SIGNATURE CHECK LEVEL
 sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
@@ -98,16 +98,47 @@ cat >> ./AppRun << 'EOF'
 HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 
+if ! [ -d $HOME/.local/share/bottles/runtimes ]; then
+	mkdir -p $HOME/.local/share/bottles/runtimes
+	bottlesruntimedlurl=$(wget -q https://api.github.com/repos/bottlesdevs/runtime/releases -O - | grep browser_download_url | grep -i "runtime-" | cut -d '"' -f 4)
+	wget -q $bottlesruntimedlurl
+	tar xf ./*.tar.gz -C $HOME/.local/share/bottles/runtimes/ 2> /dev/null
+	rm -R -f $HOME/.local/share/bottles/runtimes/*.tar.gz
+fi
+
 export BOTTLES_RUNTIME_PATH=$HOME/.local/share/bottles/runtimes/runtime/
-export GLPATH=$HERE/.junest/usr/lib/
-export VK_ICD_FILENAMES=$HERE/.junest/usr/share/vulkan/icd.d/*
+export GLPATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:$HERE/.junest/usr/lib/
 export VULKAN_DEVICE_INDEX=1
+
+export __GLX_VENDOR_LIBRARY_NAME=mesa
+
+export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:$HERE/.junest/usr/lib/
+export XDG_DATA_DIRS=/usr/share/:$HERE/.junest/usr/share/
+
+# From https://github.com/mmtrt/WINE_AppImage/blob/master/wrapper
+# --------------------------------------------------------
+export DXVK_HUD=${DXVK_HUD:-"0"}
+export DXVK_LOG_LEVEL=${DXVK_LOG_LEVEL:-"none"}
+export DXVK_STATE_CACHE=${DXVK_STATE_CACHE:-"0"}
+export DXVK_CONFIG_FILE=${DXVK_CONFIG_FILE:-"$progHome/dxvk.conf"}
+
+VENDOR=$(glxinfo -B | grep "OpenGL vendor")
+
+if [[ $VENDOR == *"Intel"* ]]; then
+	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/intel_icd.i686.json:/usr/share/vulkan/icd.d/intel_icd.x86_64.json"
+elif [[ $VENDOR == *"NVIDIA"* ]]; then
+	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/nvidia_icd.json"
+elif [[ $VENDOR == *"Radeon"* ]]; then
+	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+fi
+# --------------------------------------------------------
 
 export JUNEST_HOME=$HERE/.junest
 export PATH=$PATH:$HERE/.local/share/junest/bin
 mkdir -p $HOME/.cache
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" -- GDK_SYNCHRONIZE=1 $EXEC "$@"
+#$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" -- glxinfo "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" -- $EXEC "$@"
 EOF
 chmod a+x ./AppRun
 
@@ -129,7 +160,7 @@ ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
 	for var in $arg; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
- 		#cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
 
@@ -139,7 +170,7 @@ ARGS2=$(echo "$VIRTDEPS" | tr " " "\n")
 for arg in $ARGS2; do
 	for var in $arg; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
- 		#cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
 
@@ -188,9 +219,9 @@ rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PA
 # WE WILL MOVE EXCESS CONTENT TO BACKUP FOLDERS (STEP 1)
 # THE AFFECTED DIRECTORIES WILL BE /usr/bin (STEP 2), /usr/lib (STEP 3) AND /usr/share (STEP 4)
 
-BINSAVED="certificates mesa patool py qemu rm wine vk vulkan xz" # Enter here keywords to find and save in /usr/bin
+BINSAVED="[ certificates cut grep mesa patool py qemu rm wine vk vulkan xz" # Enter here keywords to find and save in /usr/bin
 SHARESAVED="certificates adwaita appstream gnome gtk mesa vk vulkan xml" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
-LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d dri GL gl gnome gtk libgraphene lzo mesa module nvidia pau repository selinux stemmer vk vulkan wine xml" # Enter here keywords or file/folder names to save in /usr/lib
+LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d dri GL gl gnome gtk libgraphene lzo mesa module nvidia pau repository selinux stemmer vk vulkan wine wine64 xml" # Enter here keywords or file/folder names to save in /usr/lib
 
 # STEP 1, CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
 mkdir -p ./junest-backups/usr/bin
@@ -281,6 +312,7 @@ _liblibs(){
 	readelf -d ./lib32/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./lib32/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./lib32/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./$APP.AppDir/.junest/usr/lib/dri/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
@@ -346,9 +378,13 @@ rsync -av ./deps/usr/* ./$APP.AppDir/.junest/usr/
 mkdir ./$APP.AppDir/.junest/usr/lib32
 rsync -av ./lib32/* ./$APP.AppDir/.junest/usr/lib32/
 
+# INCLUDE ALL DRIVERS
+mv ./junest-backups/usr/lib/dri/* ./$APP.AppDir/.junest/usr/lib/dri/
+
 # ADDITIONAL REMOVALS
 #mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
 rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
+sed -i 's/"faudio",/# "faudio",/g' ./$APP.AppDir/.junest/usr/share/bottles/bottles/backend/models/samples.py #Faudio is optional to use Bottles normally, in my testing this patch prevents the need to close Bottles to use it
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
@@ -359,4 +395,4 @@ mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage2.2-1-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage2.2-2-x86_64.AppImage
