@@ -4,8 +4,6 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  schedule:
-    - cron: "0 20 * * 6"
   workflow_dispatch:
 
 jobs:
@@ -42,8 +40,8 @@ jobs:
         - name: release
           uses: marvinpinto/action-automatic-releases@latest
           with:
-            title: Continuous build
-            automatic_release_tag: continuous
+            title: Experimental pre-release
+            automatic_release_tag: experimental-pre-release
             prerelease: true
             draft: false
             files: |
