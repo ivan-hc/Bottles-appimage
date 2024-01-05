@@ -3,8 +3,8 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="ca-certificates cabextract faudio lib32-faudio lib32-alsa-lib lib32-flac lib32-libao lib32-mpg123 lib32-pipewire lib32-libpulse zimg gputils imagemagick p7zip procps-ng pipewire pulseaudio python python-yaml tar lib32-vkd3d lib32-vulkan-icd-loader libnotify vkd3d vulkan-icd-loader wine winetricks xorg-xdpyinfo"
-VIRTDEPS="libepoxy libva qemu-common qemu-vhost-user-gpu qemu-hw-display-virtio-gpu-gl mesa virglrenderer"
+DEPENDENCES="cabextract ca-certificates faudio gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libglvnd libnotify libva mesa p7zip pipewire procps-ng pulseaudio python python-yaml tar vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-radeon vulkan-swrast vulkan-tools vulkan-utility-libraries vulkan-virtio wine winetricks xorg-xdpyinfo zimg"
+VIRTDEPS="libepoxy qemu-common qemu-vhost-user-gpu qemu-hw-display-virtio-gpu-gl virglrenderer"
 BASICSTUFF="binutils gzip"
 COMPILERS="base-devel"
 
@@ -21,10 +21,10 @@ chmod a+x appimagetool
 mkdir $APP.AppDir
 
 # ENTER THE APPDIR
-cd $APP.AppDir
+cd $APP.AppDir || exit
 
 # SET APPDIR AS A TEMPORARY $HOME DIRECTORY, THIS WILL DO ALL WORK INTO THE APPDIR
-HOME="$(dirname "$(readlink -f $0)")" 
+HOME="$(dirname "$(readlink -f "$0")")" 
 
 # DOWNLOAD AND INSTALL JUNEST (DON'T TOUCH THIS)
 git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
@@ -44,9 +44,9 @@ Include = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 #Include = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 
 # CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
-#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
-#rm -R ./.junest/etc/pacman.d/mirrorlist
-#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
+COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
+rm -R ./.junest/etc/pacman.d/mirrorlist
+wget -q https://archlinux.org/mirrorlist/?country="$(echo "$COUNTRY")" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
 
 # BYPASS SIGNATURE CHECK LEVEL
 sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
@@ -77,18 +77,18 @@ sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
 rm -R -f ./*.desktop
 LAUNCHER=$(grep -iRl $BIN ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" ./
-ICON=$(cat $LAUNCHER | grep "Icon=" | grep -v program | cut -c 6-)
-cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/48x48/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/64x64/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/128x128/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/192x192/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*$ICON* ./ 2>/dev/null
-cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
+ICON=$(cat "$LAUNCHER" | grep "Icon=" | grep -v program | cut -c 6-)
+cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/48x48/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/64x64/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/128x128/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/192x192/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/256x256/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*"$ICON"* ./ 2>/dev/null
+cp -r ./.junest/usr/share/pixmaps/*"$ICON"* ./ 2>/dev/null
 
 # ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
 # EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
@@ -98,18 +98,16 @@ cat >> ./AppRun << 'EOF'
 HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
 
-export __EGL_VENDOR_LIBRARY_DIRS=/etc/glvnd/egl_vendor.d/:/usr/share/glvnd/egl_vendor.d/
-export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/*
 export BOTTLES_RUNTIME_PATH=$HOME/.local/share/bottles/runtimes/runtime/
-export GLPATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/:/usr/lib/
-export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/*
+export GLPATH=$HERE/.junest/usr/lib/
+export VK_ICD_FILENAMES=$HERE/.junest/usr/share/vulkan/icd.d/*
 export VULKAN_DEVICE_INDEX=1
 
 export JUNEST_HOME=$HERE/.junest
 export PATH=$PATH:$HERE/.local/share/junest/bin
 mkdir -p $HOME/.cache
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" -- $EXEC "$@"
+$HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" -- GDK_SYNCHRONIZE=1 $EXEC "$@"
 EOF
 chmod a+x ./AppRun
 
@@ -130,7 +128,7 @@ mkdir deps
 ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
 	for var in $arg; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./deps/
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
  		#cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
@@ -140,14 +138,14 @@ tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/patool*.zst -C ./deps/
 ARGS2=$(echo "$VIRTDEPS" | tr " " "\n")
 for arg in $ARGS2; do
 	for var in $arg; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./deps/
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
  		#cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
 
 DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 for arg in $DEPS; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
@@ -155,7 +153,7 @@ done
 
 DEPS2=$(cat ./depdeps | uniq)
 for arg in $DEPS2; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
  	done
@@ -163,7 +161,7 @@ done
 
 DEPS3=$(cat ./depdeps2 | uniq)
 for arg in $DEPS3; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
  	done
@@ -171,7 +169,7 @@ done
 
 DEPS4=$(cat ./depdeps3 | uniq)
 for arg in $DEPS4; do
-	for var in "$arg"; do
+	for var in $arg; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
  	done
@@ -190,9 +188,9 @@ rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PA
 # WE WILL MOVE EXCESS CONTENT TO BACKUP FOLDERS (STEP 1)
 # THE AFFECTED DIRECTORIES WILL BE /usr/bin (STEP 2), /usr/lib (STEP 3) AND /usr/share (STEP 4)
 
-BINSAVED="certificates patool py qemu rm wine xz" # Enter here keywords to find and save in /usr/bin
-SHARESAVED="certificates adwaita appstream gnome gtk xml" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
-LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d dri GL gl gnome gtk libgraphene lzo module nvidia pau repository selinux stemmer vk wine xml" # Enter here keywords or file/folder names to save in /usr/lib
+BINSAVED="certificates mesa patool py qemu rm wine vk vulkan xz" # Enter here keywords to find and save in /usr/bin
+SHARESAVED="certificates adwaita appstream gnome gtk mesa vk vulkan xml" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
+LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d dri GL gl gnome gtk libgraphene lzo mesa module nvidia pau repository selinux stemmer vk vulkan wine xml" # Enter here keywords or file/folder names to save in /usr/lib
 
 # STEP 1, CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
 mkdir -p ./junest-backups/usr/bin
@@ -200,7 +198,7 @@ mkdir -p ./junest-backups/usr/lib/dri
 mkdir -p ./junest-backups/usr/share
 
 # TEMPORARILY MOVE 32 BIT LIBRARIES
-mv ./$APP.AppDir/usr/lib32 ./lib32
+mv ./$APP.AppDir/.junest/usr/lib32 ./lib32
 
 # STEP 2, FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
 # IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
@@ -241,8 +239,8 @@ _binlibs(){
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
-			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-			find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
+			mv ./$APP.AppDir/.junest/usr/lib/"$arg"* ./save/
+			find ./$APP.AppDir/.junest/usr/lib/ -name "$arg" -exec cp -r --parents -t save/ {} +
 		done 
 	done
 	rm -R -f $(find ./save/ | sort | grep ".AppDir" | head -1)
@@ -286,8 +284,8 @@ _liblibs(){
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
-			mv ./$APP.AppDir/.junest/usr/lib/$arg* ./save/
-			find ./$APP.AppDir/.junest/usr/lib/ -name $arg -exec cp -r --parents -t save/ {} +
+			mv ./$APP.AppDir/.junest/usr/lib/"$arg"* ./save/
+			find ./$APP.AppDir/.junest/usr/lib/ -name "$arg" -exec cp -r --parents -t save/ {} +
 		done 
 	done
 	rsync -av ./save/$APP.AppDir/.junest/usr/lib/* ./save/
@@ -345,8 +343,8 @@ _saveshare 2> /dev/null
 rsync -av ./deps/usr/* ./$APP.AppDir/.junest/usr/
 
 # RESTORE 32-BIT LIBRARIES
-mkdir ./$APP.AppDir/usr/lib32
-rsync -av ./lib32/* ./$APP.AppDir/usr/lib32/
+mkdir ./$APP.AppDir/.junest/usr/lib32
+rsync -av ./lib32/* ./$APP.AppDir/.junest/usr/lib32/
 
 # ADDITIONAL REMOVALS
 #mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
@@ -361,4 +359,4 @@ mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-archimage2.2-1-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage2.2-1-x86_64.AppImage
