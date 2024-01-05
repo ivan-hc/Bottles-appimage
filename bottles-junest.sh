@@ -101,9 +101,9 @@ export UNION_PRELOAD=$HERE
 if ! [ -d $HOME/.local/share/bottles/runtimes ]; then
 	mkdir -p $HOME/.local/share/bottles/runtimes
 	bottlesruntimedlurl=$(wget -q https://api.github.com/repos/bottlesdevs/runtime/releases -O - | grep browser_download_url | grep -i "runtime-" | cut -d '"' -f 4)
-	wget -q $bottlesruntimedlurl
-	tar xf ./*.tar.gz -C $HOME/.local/share/bottles/runtimes/ 2> /dev/null
-	rm -R -f $HOME/.local/share/bottles/runtimes/*.tar.gz
+	wget -q $bottlesruntimedlurl -O Bottles-runtime.tar.gz
+	tar xf ./Bottles-runtime.tar.gz -C $HOME/.local/share/bottles/runtimes/ 2> /dev/null
+	rm -R -f ./Bottles-runtime.tar.gz
 fi
 
 export BOTTLES_RUNTIME_PATH=$HOME/.local/share/bottles/runtimes/runtime/
