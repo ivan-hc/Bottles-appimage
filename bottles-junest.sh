@@ -3,9 +3,10 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="procps-ng pipewire pulseaudio python-yaml tar lib32-vkd3d lib32-vulkan-icd-loader vkd3d vulkan-icd-loader"
-BASICSTUFF="base-devel binutils gzip"
-#COMPILERS="gcc"
+DEPENDENCES="ca-certificates cabextract faudio lib32-faudio lib32-alsa-lib lib32-flac lib32-libao lib32-mpg123 lib32-pipewire lib32-libpulse zimg gputils imagemagick p7zip procps-ng pipewire pulseaudio python python-yaml tar lib32-vkd3d lib32-vulkan-icd-loader libnotify vkd3d vulkan-icd-loader wine winetricks xorg-xdpyinfo"
+VIRTDEPS="libepoxy libva qemu-common qemu-vhost-user-gpu qemu-hw-display-virtio-gpu-gl mesa virglrenderer"
+BASICSTUFF="binutils gzip"
+COMPILERS="base-devel"
 
 # ADD A VERSION, THIS IS NEEDED FOR THE NAME OF THE FINEL APPIMAGE, IF NOT AVAILABLE ON THE REPO, THE VALUE COME FROM AUR, AND VICE VERSA
 for REPO in { "core" "extra" "community" "multilib" }; do
@@ -43,9 +44,9 @@ Include = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 #Include = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 
 # CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
-COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
-rm -R ./.junest/etc/pacman.d/mirrorlist
-wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
+#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
+#rm -R ./.junest/etc/pacman.d/mirrorlist
+#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
 
 # BYPASS SIGNATURE CHECK LEVEL
 sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
@@ -57,10 +58,9 @@ sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
 
 # INSTALL THE PROGRAM USING YAY
 ./.local/share/junest/bin/junest -- yay -Syy
-./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS $DEPENDENCES")
-./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
-echo y | ./.local/share/junest/bin/junest -- yay --answerclean All --answerdiff All --noconfirm -S $APP
-./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Rcns gcc
+./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
+./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS $DEPENDENCES $VIRTDEPS")
+echo y | ./.local/share/junest/bin/junest -- yay --answerclean All --answerdiff All --noconfirm -Sa $APP patool
 
 # SET THE LOCALE (DON'T TOUCH THIS)
 #sed "s/# /#>/g" ./.junest/etc/locale.gen | sed "s/#//g" | sed "s/>/#/g" >> ./locale.gen # UNCOMMENT TO ENABLE ALL THE LANGUAGES
@@ -77,7 +77,7 @@ sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' ./.junest/etc/profile.d/locale.sh
 rm -R -f ./*.desktop
 LAUNCHER=$(grep -iRl $BIN ./.junest/usr/share/applications/* | grep ".desktop" | head -1)
 cp -r "$LAUNCHER" ./
-ICON=$(cat $LAUNCHER | grep "Icon=" | cut -c 6-)
+ICON=$(cat $LAUNCHER | grep "Icon=" | grep -v program | cut -c 6-)
 cp -r ./.junest/usr/share/icons/hicolor/22x22/apps/*$ICON* ./ 2>/dev/null
 cp -r ./.junest/usr/share/icons/hicolor/24x24/apps/*$ICON* ./ 2>/dev/null
 cp -r ./.junest/usr/share/icons/hicolor/32x32/apps/*$ICON* ./ 2>/dev/null
@@ -97,21 +97,19 @@ cat >> ./AppRun << 'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f $0)")"
 export UNION_PRELOAD=$HERE
+
 export __EGL_VENDOR_LIBRARY_DIRS=/etc/glvnd/egl_vendor.d/:/usr/share/glvnd/egl_vendor.d/
 export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/*
 export BOTTLES_RUNTIME_PATH=$HOME/.local/share/bottles/runtimes/runtime/
 export GLPATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/:/usr/lib/
-export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"
-export LIBVA_DRIVERS_PATH=/lib/x86_64-linux-gnu/dri/
 export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/*
 export VULKAN_DEVICE_INDEX=1
-export VULKAN_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/:/usr/lib/
+
 export JUNEST_HOME=$HERE/.junest
-export PATH=$HERE/.local/share/junest/bin/:$PATH
+export PATH=$PATH:$HERE/.local/share/junest/bin
 mkdir -p $HOME/.cache
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 $HERE/.local/share/junest/bin/junest proot -n -b "--bind=/home --bind=/home/$(echo $USER) --bind=/media --bind=/mnt --bind=/opt --bind=/usr/lib/locale --bind=/etc --bind=/usr/share/fonts --bind=/usr/share/themes" -- $EXEC "$@"
-rm -R -f $HOME/.local/share/bottles/temp/*
 EOF
 chmod a+x ./AppRun
 
@@ -128,10 +126,55 @@ mkdir base
 tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$APP*.zst -C ./base/
 
 mkdir deps
-for arg in $DEPENDENCES; do
+
+ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
+for arg in $ARGS; do
 	for var in $arg; do
  		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./deps/
+ 		#cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
+done
+
+tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/patool*.zst -C ./deps/
+
+ARGS2=$(echo "$VIRTDEPS" | tr " " "\n")
+for arg in $ARGS2; do
+	for var in $arg; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./deps/
+ 		#cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+	done
+done
+
+DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
+for arg in $DEPS; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+	done
+done
+
+DEPS2=$(cat ./depdeps | uniq)
+for arg in $DEPS2; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
+ 	done
+done
+
+DEPS3=$(cat ./depdeps2 | uniq)
+for arg in $DEPS3; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
+ 	done
+done
+
+DEPS4=$(cat ./depdeps3 | uniq)
+for arg in $DEPS4; do
+	for var in "$arg"; do
+ 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
+ 	done
 done
 
 # REMOVE SOME BLOATWARES
@@ -147,15 +190,21 @@ rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PA
 # WE WILL MOVE EXCESS CONTENT TO BACKUP FOLDERS (STEP 1)
 # THE AFFECTED DIRECTORIES WILL BE /usr/bin (STEP 2), /usr/lib (STEP 3) AND /usr/share (STEP 4)
 
+BINSAVED="certificates patool py qemu rm wine xz" # Enter here keywords to find and save in /usr/bin
+SHARESAVED="certificates adwaita appstream gnome gtk xml" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
+LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d dri GL gl gnome gtk libgraphene lzo module nvidia pau repository selinux stemmer vk wine xml" # Enter here keywords or file/folder names to save in /usr/lib
+
 # STEP 1, CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
 mkdir -p ./junest-backups/usr/bin
 mkdir -p ./junest-backups/usr/lib/dri
 mkdir -p ./junest-backups/usr/share
 
+# TEMPORARILY MOVE 32 BIT LIBRARIES
+mv ./$APP.AppDir/usr/lib32 ./lib32
+
 # STEP 2, FUNCTION TO SAVE THE BINARIES IN /usr/bin THAT ARE NEEDED TO MADE JUNEST WORK, PLUS THE MAIN BINARY/BINARIES OF THE APP
 # IF YOU NEED TO SAVE MORE BINARIES, LIST THEM IN THE "BINSAVED" VARIABLE. COMMENT THE LINE "_savebins" IF YOU ARE NOT SURE.
 _savebins(){
-	BINSAVED="SAVEBINSPLEASE"
 	mkdir save
 	mv ./$APP.AppDir/.junest/usr/bin/*$BIN* ./save/
 	mv ./$APP.AppDir/.junest/usr/bin/bash ./save/
@@ -172,7 +221,7 @@ _savebins(){
  	rsync -av ./base/usr/bin/* ./$APP.AppDir/.junest/usr/bin/
 	rmdir save
 }
-#_savebins 2> /dev/null
+_savebins 2> /dev/null
 
 # STEP 3, MOVE UNNECESSARY LIBRARIES TO A BACKUP FOLDER (FOR TESTING PURPOSES)
 mkdir save
@@ -184,7 +233,6 @@ _binlibs(){
 	mv ./$APP.AppDir/.junest/usr/lib/*$BIN* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/libdw* ./save/
 	mv ./$APP.AppDir/.junest/usr/lib/libelf* ./save/
-	SHARESAVED="SAVESHAREPLEASE" # Enter here keywords or file/folder names to save in /usr/lib. By default, the names of the folders that you will save in /usr/share are selected also here.
 	for arg in $SHARESAVED; do
 		for var in $arg; do
  			mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
@@ -207,7 +255,6 @@ _include_swrast_dri(){
 }
 
 _libkeywords(){
-	LIBSAVED="SAVELIBSPLEASE" # Enter here keywords or file/folder names to save in /usr/lib.
 	for arg in $LIBSAVED; do
 		for var in $arg; do
  			mv ./$APP.AppDir/.junest/usr/lib/*"$arg"* ./save/
@@ -231,6 +278,11 @@ _liblibs(){
 	readelf -d ./deps/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./deps/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	readelf -d ./deps/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./lib32/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./lib32/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./lib32/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./lib32/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
+	readelf -d ./lib32/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		for var in $arg; do
@@ -249,26 +301,25 @@ _mvlibs(){
  	rsync -av ./base/usr/lib/* ./$APP.AppDir/.junest/usr/lib/
 }
 
-#_binlibs 2> /dev/null
+_binlibs 2> /dev/null
 
-#_include_swrast_dri 2> /dev/null
+_include_swrast_dri 2> /dev/null
 
-#_libkeywords 2> /dev/null
+_libkeywords 2> /dev/null
 
-#_liblibs 2> /dev/null
-#_liblibs 2> /dev/null
-#_liblibs 2> /dev/null
-#_liblibs 2> /dev/null
-#_liblibs 2> /dev/null
+_liblibs 2> /dev/null
+_liblibs 2> /dev/null
+_liblibs 2> /dev/null
+_liblibs 2> /dev/null
+_liblibs 2> /dev/null
 
-#_mvlibs 2> /dev/null
+_mvlibs 2> /dev/null
 
 rmdir save
 
 # STEP 4, SAVE ONLY SOME DIRECTORIES CONTAINED IN /usr/share
 # IF YOU NEED TO SAVE MORE FOLDERS, LIST THEM IN THE "SHARESAVED" VARIABLE. COMMENT THE LINE "_saveshare" IF YOU ARE NOT SURE.
 _saveshare(){
-	SHARESAVED="SAVESHAREPLEASE"
 	mkdir save
 	mv ./$APP.AppDir/.junest/usr/share/*$APP* ./save/
  	mv ./$APP.AppDir/.junest/usr/share/*$BIN* ./save/
@@ -288,11 +339,18 @@ _saveshare(){
  	rsync -av ./base/usr/share/* ./$APP.AppDir/.junest/usr/share/
 	rmdir save
 }
-#_saveshare 2> /dev/null
+_saveshare 2> /dev/null
+
+# RSYNC DEPENDENCES
+rsync -av ./deps/usr/* ./$APP.AppDir/.junest/usr/
+
+# RESTORE 32-BIT LIBRARIES
+mkdir ./$APP.AppDir/usr/lib32
+rsync -av ./lib32/* ./$APP.AppDir/usr/lib32/
 
 # ADDITIONAL REMOVALS
 #mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
-#rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
+rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
@@ -303,4 +361,4 @@ mkdir -p ./$APP.AppDir/.junest/media
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION""$VERSIONAUR"-archimage2.1-4-alpha2-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-archimage2.2-1-x86_64.AppImage
