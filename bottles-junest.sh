@@ -94,95 +94,10 @@ cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*$ICON* ./ 2>/dev/null
 cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*$ICON* ./ 2>/dev/null
 cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
 
-# ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
-# EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
+# ...AND FINALLY ADD THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
+# DOWNLOAD IT FROM https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/AppRun
 rm -R -f ./AppRun
-cat >> ./AppRun << 'EOF'
-#!/usr/bin/env bash
-HERE="$(dirname "$(readlink -f $0)")"
-export UNION_PRELOAD=$HERE
-
-if ! [ -d $HOME/.local/share/bottles/runtimes ]; then
-	mkdir -p $HOME/.local/share/bottles/runtimes
-	bottlesruntimedlurl=$(wget -q https://api.github.com/repos/bottlesdevs/runtime/releases -O - | grep browser_download_url | grep -i "runtime-" | cut -d '"' -f 4)
-	wget -q $bottlesruntimedlurl -O Bottles-runtime.tar.gz
-	tar xf ./Bottles-runtime.tar.gz -C $HOME/.local/share/bottles/runtimes/ 2> /dev/null
-	rm -R -f ./Bottles-runtime.tar.gz
-fi
-
-if ! [ -d $HOME/.local/share/bottles/junest ]; then
-	mkdir -p $HOME/.local/share/bottles/junest
-	rsync -av -f"+ */" -f"- *" "$HERE/.junest/" "$HOME/.local/share/bottles/junest/"
-fi
-
-VENDOR=$(glxinfo -B | grep "OpenGL vendor")
-
-if [[ $VENDOR == *"Intel"* ]]; then
-	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/intel_icd.i686.json:/usr/share/vulkan/icd.d/intel_icd.x86_64.json"
-elif [[ $VENDOR == *"NVIDIA"* ]]; then
-        NVIDIAJSON=$(find /usr/share -name "*nvidia*json" | sed 's/ /:/g')
-	export VK_ICD_FILENAMES=$NVIDIAJSON
-	NVIDIA=$(find /usr/lib -name "*nvidia*.so*")
-	for arg in $NVIDIA; do
-		for var in $arg; do
-			export LD_PRELOAD="$arg"
-		done
-	done
-elif [[ $VENDOR == *"Radeon"* ]]; then
-	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
-fi
-
-export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:$JUNEST_HOME/usr/lib
-
-export XDG_DATA_DIRS=/usr/share/:$JUNEST_HOME/usr/share
-DRIPATH=$(find /usr/lib -name dri)
-export LIBVA_DRIVERS_PATH=$DRIPATH
-export GLPATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:$HERE/.junest/usr/lib
-export VULKAN_DEVICE_INDEX=1
-export __GLX_VENDOR_LIBRARY_NAME=mesa
-
-LLVM=$(find /usr/lib -name "*LLVM*")
-for arg in $LLVM; do
-	for var in $arg; do
-		export LD_PRELOAD="$var"
-	done
-done
-
-MESA=$(find /usr/lib -name *mesa.so*)
-for arg in $MESA; do
-	for var in $arg; do
-		export LD_PRELOAD="$var"
-	done
-done
-
-D3D=$(find /usr/lib -name "d3d*.so")
-for arg in $D3D; do
-	for var in $arg; do
-		export LD_PRELOAD="$var"
-	done
-done
-
-EGL=$(find /usr/lib -name "libEGL*" | grep -v "libEGL_mesa")
-for arg in $EGL; do
-	for var in $arg; do
-		export LD_PRELOAD="$var"
-	done
-done
-
-SWRAST=$(find /usr/lib -name *swrast*)
-for arg in $SWRAST; do
-	for var in $arg; do
-		export LD_PRELOAD="$var"
-	done
-done
-
-export JUNEST_HOME=$HERE/.junest
-export PATH=$PATH:$HERE/.local/share/junest/bin
-mkdir -p $HOME/.cache
-EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-#$HERE/.local/share/junest/bin/junest -n -b "--bind $JUNEST_HOME/usr/share/ibus-1 /usr/share/ibus-1 --bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules --bind $JUNEST_HOME/usr/lib/nvidia /usr/lib/nvidia --bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg --bind $JUNEST_HOME/usr/share/xorg /usr/share/xorg" -- glxinfo "$@"
-$HERE/.local/share/junest/bin/junest -n -b "--bind $JUNEST_HOME/usr/share/glvnd /usr/share/glvnd --bind $JUNEST_HOME/usr/share/ibus-1 /usr/share/ibus-1 --bind $JUNEST_HOME/usr/share/vulkan /usr/share/vulkan --bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules --bind $JUNEST_HOME/usr/lib/nvidia /usr/lib/nvidia --bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg --bind $JUNEST_HOME/usr/share/xorg /usr/share/xorg" -- $EXEC "$@"
-EOF
+wget -q https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/AppRun
 chmod a+x ./AppRun
 
 # REMOVE "READ-ONLY FILE SYSTEM" ERRORS
@@ -442,4 +357,4 @@ mkdir -p ./$APP.AppDir/.junest/run/user
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage3-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage3-pre1-x86_64.AppImage
