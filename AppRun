@@ -109,12 +109,26 @@ function _host_accelleration(){
 ACCELL_DRIVERS=$(echo $(echo "$(_host_accelleration)") | sed 's/ /:/g')
 BINDLIBS=$(echo $(cat $HOME/.cache/hostdri2junest | uniq | sort -u) | sed 's/ /:/g')
 
+rm -f $HOME/.cache/libbinds $HOME/.cache/libbindbinds
+echo $ACCELL_DRIVERS | tr ":" "\n" >> $HOME/.cache/libbinds
+echo $BINDLIBS | tr ":" "\n" >> $HOME/.cache/libbinds
+for arg in $(cat $HOME/.cache/libbinds); do
+	for var in "$arg"; do
+		echo "$arg $(echo $arg | sed 's#/x86_64-linux-gnu##g' | cut -d/ -f1,2,3 )" >> $HOME/.cache/libbindbinds
+		break
+	done
+done
+sed -i -e 's#^#--bind / / --bind #' $HOME/.cache/libbindbinds
+
+#BINDS=$(cat $HOME/.cache/libbinds | tr "\n" " ")
+
+
 # CHECK FOR LIBLLVM
-HOST_LIBLLVM=$(find /usr/lib -name "*libLLVM*" | grep -v ".so.")
-JUNEST_LIBLLVM=$(find $JUNEST_HOME/usr/lib -name "*libLLVM*" | grep -v ".so.")
+#HOST_LIBLLVM=$(find /usr/lib -name "*libLLVM*" | grep -v ".so.")
+#JUNEST_LIBLLVM=$(find $JUNEST_HOME/usr/lib -name "*libLLVM*" | grep -v ".so.")
 
 # EXPORT LIBRARIES
-export LD_LIBRARY_PATH=/lib:/lib64:/lib/x86_64-linux-gnu:/usr/lib:$JUNEST_HOME/lib:$JUNEST_HOME/usr/lib
+#export LD_LIBRARY_PATH=/lib:/lib64:/lib/x86_64-linux-gnu:/usr/lib:$JUNEST_HOME/lib:$JUNEST_HOME/usr/lib
 #export LD_PRELOAD=$DRIPATH/swrast_dri.so
 
 # NORMAL ARCHIMAGE SETTINGS
@@ -123,16 +137,43 @@ export PATH=$PATH:$HERE/.local/share/junest/bin
 mkdir -p $HOME/.cache
 
 # UNCOMMENT JUST ONE OF THE FOLLOWING "EXEC=" TO CHOOSE WHAT TO RUN BETWEEN BOTTLES OR GLXINFO
-EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-#EXEC="glxinfo"
+#EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
+EXEC="glxinfo"
 
-$HERE/.local/share/junest/bin/junest -n -b "\
-	--bind $JUNEST_HOME/usr/share/glvnd /usr/share/glvnd\
-	--bind $JUNEST_HOME/usr/share/ibus-1 /usr/share/ibus-1\
-	--bind $JUNEST_HOME/usr/share/vulkan /usr/share/vulkan\
-	--bind $JUNEST_HOME/usr/lib/dri $DRIPATH\
-	--bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules\
-	--bind $JUNEST_HOME/usr/lib/nvidia /usr/lib/nvidia\
-	--bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg\
-	--bind $JUNEST_HOME/usr/libexec /usr/libexec\
-	" -- $EXEC "$@"
+function _exec(){
+	if [[ $VENDOR == *"NVIDIA"* ]]; then
+		$HERE/.local/share/junest/bin/junest -n -b "$BINDS\
+			--bind $JUNEST_HOME/usr/lib/ConsoleKit /usr/lib/ConsoleKit\
+			--bind $JUNEST_HOME/usr/lib/dri $DRIPATH\
+			--bind $JUNEST_HOME/usr/libexec /usr/libexec\
+			--bind $JUNEST_HOME/usr/lib/firmware /usr/lib/firmware\
+			--bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules\
+			--bind $JUNEST_HOME/usr/lib/nvidia /usr/lib/nvidia\
+			--bind $JUNEST_HOME/usr/lib/systemd /usr/lib/systemd\
+			--bind $JUNEST_HOME/usr/lib/udev /usr/lib/udev\
+			--bind $JUNEST_HOME/usr/lib/vdpau /usr/lib/vdpau\
+			--bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg\
+			--bind $JUNEST_HOME/usr/share/bug /usr/share/bug\
+			--bind $JUNEST_HOME/usr/share/doc /usr/share/doc\
+			--bind $JUNEST_HOME/usr/share/egl /usr/share/egl\
+			--bind $JUNEST_HOME/usr/share/glvnd /usr/share/glvnd\
+			--bind $JUNEST_HOME/usr/share/ibus-1 /usr/share/ibus-1\
+			--bind $JUNEST_HOME/usr/share/lightdm /usr/share/lightdm\
+			--bind $JUNEST_HOME/usr/share/lintian /usr/share/lintian\
+			--bind $JUNEST_HOME/usr/share/man /usr/share/man\
+			--bind $JUNEST_HOME/usr/share/nvidia /usr/share/nvidia\
+			--bind $JUNEST_HOME/usr/share/vulkan /usr/share/vulkan\
+			" -- $EXEC "$@"
+	else
+		$HERE/.local/share/junest/bin/junest -n -b "\
+			--bind $JUNEST_HOME/usr/lib/dri $DRIPATH\
+			--bind $JUNEST_HOME/usr/libexec /usr/libexec\
+			--bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules\
+			--bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg\
+			--bind $JUNEST_HOME/usr/share/glvnd /usr/share/glvnd\
+			--bind $JUNEST_HOME/usr/share/ibus-1 /usr/share/ibus-1\
+			--bind $JUNEST_HOME/usr/share/vulkan /usr/share/vulkan\
+			" -- $EXEC "$@"
+	fi
+}
+_exec
