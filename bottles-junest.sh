@@ -344,14 +344,28 @@ rm -R -f ./$APP.AppDir/.junest/home
 # ENABLE MOUNTPOINTS
 mkdir -p ./$APP.AppDir/.junest/home
 mkdir -p ./$APP.AppDir/.junest/media
+mkdir -p ./$APP.AppDir/.junest/usr/lib/ConsoleKit #
+mkdir -p ./$APP.AppDir/.junest/usr/lib/firmware #
 mkdir -p ./$APP.AppDir/.junest/usr/lib/locale
 mkdir -p ./$APP.AppDir/.junest/usr/lib/modules
 mkdir -p ./$APP.AppDir/.junest/usr/lib/nvidia
+mkdir -p ./$APP.AppDir/.junest/usr/lib/systemd #
+mkdir -p ./$APP.AppDir/.junest/usr/lib/udev #
+mkdir -p ./$APP.AppDir/.junest/usr/lib/vdpau #
 mkdir -p ./$APP.AppDir/.junest/usr/lib/xorg
+mkdir -p ./$APP.AppDir/.junest/usr/libexec
+mkdir -p ./$APP.AppDir/.junest/usr/share/bug #
+mkdir -p ./$APP.AppDir/.junest/usr/share/doc #
+mkdir -p ./$APP.AppDir/.junest/usr/share/egl #
 mkdir -p ./$APP.AppDir/.junest/usr/share/fonts
 mkdir -p ./$APP.AppDir/.junest/usr/share/glvnd
 mkdir -p ./$APP.AppDir/.junest/usr/share/ibus-1
+mkdir -p ./$APP.AppDir/.junest/usr/share/lintian #
+mkdir -p ./$APP.AppDir/.junest/usr/share/man #
+mkdir -p ./$APP.AppDir/.junest/usr/share/nvidia #
 mkdir -p ./$APP.AppDir/.junest/usr/share/themes
+mkdir -p ./$APP.AppDir/.junest/usr/share/vulkan #
+mkdir -p ./$APP.AppDir/.junest/usr/share/lightdm #
 mkdir -p ./$APP.AppDir/.junest/usr/share/xorg
 mkdir -p ./$APP.AppDir/.junest/run/user
 
