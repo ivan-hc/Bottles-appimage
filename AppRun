@@ -164,6 +164,7 @@ function _exec(){
 			--bind /usr/share/man $JUNEST_HOME/usr/share/man\
 			--bind /usr/share/nvidia $JUNEST_HOME/usr/share/nvidia\
 			--bind /usr/share/vulkan $JUNEST_HOME/usr/share/vulkan\
+			--bind /usr/src $JUNEST_HOME/usr/src\
 			" -- $EXEC "$@"
 	else
 		$HERE/.local/share/junest/bin/junest -n -b "\
@@ -174,6 +175,7 @@ function _exec(){
 			--bind /usr/share/dbus-1 $JUNEST_HOME/usr/share/dbus-1\
 			--bind /usr/share/glvnd $JUNEST_HOME/usr/share/glvnd\
 			--bind /usr/share/vulkan $JUNEST_HOME/usr/share/vulkan\
+			--bind /usr/src $JUNEST_HOME/usr/src\
 			" -- $EXEC "$@"
 	fi
 }
