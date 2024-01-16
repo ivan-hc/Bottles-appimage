@@ -144,7 +144,6 @@ function _exec(){
 	if [[ $VENDOR == *"NVIDIA"* ]]; then
 		$HERE/.local/share/junest/bin/junest -n -b "$BINDS\
 			--bind $JUNEST_HOME/usr/lib/ConsoleKit /usr/lib/ConsoleKit\
-			--bind $JUNEST_HOME/usr/lib/dri $DRIPATH\
 			--bind $JUNEST_HOME/usr/libexec /usr/libexec\
 			--bind $JUNEST_HOME/usr/lib/firmware /usr/lib/firmware\
 			--bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules\
@@ -166,7 +165,6 @@ function _exec(){
 			" -- $EXEC "$@"
 	else
 		$HERE/.local/share/junest/bin/junest -n -b "\
-			--bind $JUNEST_HOME/usr/lib/dri $DRIPATH\
 			--bind $JUNEST_HOME/usr/libexec /usr/libexec\
 			--bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules\
 			--bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg\
