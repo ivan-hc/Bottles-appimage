@@ -48,6 +48,7 @@ echo "$VENDORLIBRARIES" >> $HOME/.cache/hostdri2junest
 
 # FIND LIBRARIES ON THE HOST
 DRIPATH=$(find /usr/lib -name dri)
+VDPAUPATH=$(find /usr/lib -maxdepth 2 -name vdpau)
 export LIBVA_DRIVERS_PATH=$DRIPATH
 export GLPATH=/lib:/lib64:/lib/x86_64-linux-gnu:/usr/lib
 export VULKAN_DEVICE_INDEX=1
@@ -137,40 +138,42 @@ export PATH=$PATH:$HERE/.local/share/junest/bin
 mkdir -p $HOME/.cache
 
 # UNCOMMENT JUST ONE OF THE FOLLOWING "EXEC=" TO CHOOSE WHAT TO RUN BETWEEN BOTTLES OR GLXINFO
-#EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-EXEC="glxinfo"
+EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
+#EXEC="glxinfo"
 
 function _exec(){
 	if [[ $VENDOR == *"NVIDIA"* ]]; then
 		$HERE/.local/share/junest/bin/junest -n -b "$BINDS\
-			--bind $JUNEST_HOME/usr/lib/ConsoleKit /usr/lib/ConsoleKit\
-			--bind $JUNEST_HOME/usr/libexec /usr/libexec\
-			--bind $JUNEST_HOME/usr/lib/firmware /usr/lib/firmware\
-			--bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules\
-			--bind $JUNEST_HOME/usr/lib/nvidia /usr/lib/nvidia\
-			--bind $JUNEST_HOME/usr/lib/systemd /usr/lib/systemd\
-			--bind $JUNEST_HOME/usr/lib/udev /usr/lib/udev\
-			--bind $JUNEST_HOME/usr/lib/vdpau /usr/lib/vdpau\
-			--bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg\
-			--bind $JUNEST_HOME/usr/share/bug /usr/share/bug\
-			--bind $JUNEST_HOME/usr/share/doc /usr/share/doc\
-			--bind $JUNEST_HOME/usr/share/egl /usr/share/egl\
-			--bind $JUNEST_HOME/usr/share/glvnd /usr/share/glvnd\
-			--bind $JUNEST_HOME/usr/share/ibus-1 /usr/share/ibus-1\
-			--bind $JUNEST_HOME/usr/share/lightdm /usr/share/lightdm\
-			--bind $JUNEST_HOME/usr/share/lintian /usr/share/lintian\
-			--bind $JUNEST_HOME/usr/share/man /usr/share/man\
-			--bind $JUNEST_HOME/usr/share/nvidia /usr/share/nvidia\
-			--bind $JUNEST_HOME/usr/share/vulkan /usr/share/vulkan\
+			--bind /usr/lib/ConsoleKit $JUNEST_HOME/usr/lib/ConsoleKit\
+			--bind $DRIPATH $JUNEST_HOME/usr/lib/dri\
+			--bind /usr/libexec $JUNEST_HOME/usr/libexec\
+			--bind /usr/lib/firmware $JUNEST_HOME/usr/lib/firmware\
+			--bind /usr/lib/modules $JUNEST_HOME/usr/lib/modules\
+			--bind /usr/lib/nvidia $JUNEST_HOME/usr/lib/nvidia\
+			--bind /usr/lib/systemd $JUNEST_HOME/usr/lib/systemd\
+			--bind /usr/lib/udev $JUNEST_HOME/usr/lib/udev\
+			--bind $VDPAUPATH $JUNEST_HOME/usr/lib/vdpau\
+			--bind /usr/lib/xorg $JUNEST_HOME/usr/lib/xorg\
+			--bind /usr/share/bug $JUNEST_HOME/usr/share/bug\
+			--bind /usr/share/dbus-1 $JUNEST_HOME/usr/share/dbus-1\
+			--bind /usr/share/doc $JUNEST_HOME/usr/share/doc\
+			--bind /usr/share/egl $JUNEST_HOME/usr/share/egl\
+			--bind /usr/share/glvnd $JUNEST_HOME/usr/share/glvnd\
+			--bind /usr/share/lightdm $JUNEST_HOME/usr/share/lightdm\
+			--bind /usr/share/lintian $JUNEST_HOME/usr/share/lintian\
+			--bind /usr/share/man $JUNEST_HOME/usr/share/man\
+			--bind /usr/share/nvidia $JUNEST_HOME/usr/share/nvidia\
+			--bind /usr/share/vulkan $JUNEST_HOME/usr/share/vulkan\
 			" -- $EXEC "$@"
 	else
 		$HERE/.local/share/junest/bin/junest -n -b "\
-			--bind $JUNEST_HOME/usr/libexec /usr/libexec\
-			--bind $JUNEST_HOME/usr/lib/modules /usr/lib/modules\
-			--bind $JUNEST_HOME/usr/lib/xorg /usr/lib/xorg\
-			--bind $JUNEST_HOME/usr/share/glvnd /usr/share/glvnd\
-			--bind $JUNEST_HOME/usr/share/ibus-1 /usr/share/ibus-1\
-			--bind $JUNEST_HOME/usr/share/vulkan /usr/share/vulkan\
+			--bind $DRIPATH $JUNEST_HOME/usr/lib/dri\
+			--bind /usr/libexec $JUNEST_HOME/usr/libexec\
+			--bind /usr/lib/modules $JUNEST_HOME/usr/lib/modules\
+			--bind /usr/lib/xorg $JUNEST_HOME/usr/lib/xorg\
+			--bind /usr/share/dbus-1 $JUNEST_HOME/usr/share/dbus-1\
+			--bind /usr/share/glvnd $JUNEST_HOME/usr/share/glvnd\
+			--bind /usr/share/vulkan $JUNEST_HOME/usr/share/vulkan\
 			" -- $EXEC "$@"
 	fi
 }
