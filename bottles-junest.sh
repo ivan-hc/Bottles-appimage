@@ -355,11 +355,11 @@ mkdir -p ./$APP.AppDir/.junest/usr/lib/vdpau #
 mkdir -p ./$APP.AppDir/.junest/usr/lib/xorg
 mkdir -p ./$APP.AppDir/.junest/usr/libexec
 mkdir -p ./$APP.AppDir/.junest/usr/share/bug #
+mkdir -p ./$APP.AppDir/.junest/usr/share/dbus-1
 mkdir -p ./$APP.AppDir/.junest/usr/share/doc #
 mkdir -p ./$APP.AppDir/.junest/usr/share/egl #
 mkdir -p ./$APP.AppDir/.junest/usr/share/fonts
 mkdir -p ./$APP.AppDir/.junest/usr/share/glvnd
-mkdir -p ./$APP.AppDir/.junest/usr/share/ibus-1
 mkdir -p ./$APP.AppDir/.junest/usr/share/lintian #
 mkdir -p ./$APP.AppDir/.junest/usr/share/man #
 mkdir -p ./$APP.AppDir/.junest/usr/share/nvidia #
@@ -371,4 +371,4 @@ mkdir -p ./$APP.AppDir/.junest/run/user
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage3-pre1-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage3-pre2-x86_64.AppImage
