@@ -7,13 +7,6 @@ DEPENDENCES="ca-certificates cabextract ca-certificates faudio gamemode gputils 
 BASICSTUFF="binutils gzip"
 COMPILERS="meson ninja blueprint-compiler"
 
-# ADD A VERSION, THIS IS NEEDED FOR THE NAME OF THE FINEL APPIMAGE, IF NOT AVAILABLE ON THE REPO, THE VALUE COME FROM AUR, AND VICE VERSA
-for REPO in { "core" "extra" "community" "multilib" }; do
-echo "$(wget -q https://archlinux.org/packages/$REPO/x86_64/$APP/flag/ -O - | grep $APP | grep details | head -1 | grep -o -P '(?<=/a> ).*(?= )' | grep -o '^\S*')" >> version
-done
-VERSION=$(cat ./version | grep -w -v "" | head -1)
-VERSIONAUR=$(wget -q https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$APP -O - | grep pkgver | head -1 | cut -c 8-)
-
 # CREATE THE APPDIR (DON'T TOUCH THIS)...
 wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
 chmod a+x appimagetool
@@ -111,22 +104,22 @@ cd ..
 
 # EXTRACT PACKAGE CONTENT
 mkdir base
-tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$APP*.zst -C ./base/
-
+tar fx $(find ./$APP.AppDir -name $APP-[0-9]*zst | head -1) -C ./base/
+VERSION=$(cat ./base/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
 mkdir deps
 
 ARGS=$(echo "$DEPENDENCES" | tr " " "\n")
 for arg in $ARGS; do
 	for var in $arg; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/$arg*.zst -C ./deps/
-		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
+ 		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
 
 DEPS=$(cat ./base/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<")
 for arg in $DEPS; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps
 	done
 done
@@ -134,7 +127,7 @@ done
 DEPS2=$(cat ./depdeps | uniq)
 for arg in $DEPS2; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps2
  	done
 done
@@ -142,7 +135,7 @@ done
 DEPS3=$(cat ./depdeps2 | uniq)
 for arg in $DEPS3; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps3
  	done
 done
@@ -150,7 +143,7 @@ done
 DEPS4=$(cat ./depdeps3 | uniq)
 for arg in $DEPS4; do
 	for var in "$arg"; do
- 		tar fx $APP.AppDir/.junest/var/cache/pacman/pkg/"$arg"*.zst -C ./deps/
+ 		tar fx $(find ./$APP.AppDir -name $arg-[0-9]*zst) -C ./deps/
  		cat ./deps/.PKGINFO | grep "depend = " | grep -v "makedepend = " | cut -c 10- | grep -v "=\|>\|<" > depdeps4
  	done
 done
@@ -371,4 +364,4 @@ mkdir -p ./$APP.AppDir/.junest/run/user
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSIONAUR"_Unofficial-Experimental-2-archimage3-pre2-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-2-archimage3-pre2-x86_64.AppImage
