@@ -91,7 +91,6 @@ cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
 # ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
 # EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
 rm -R -f ./AppRun
-cat >> ./AppRun << 'EOF'
 wget -q https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/AppRun
 chmod a+x ./AppRun
 
