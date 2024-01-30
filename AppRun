@@ -147,8 +147,8 @@ function _exec(){
 	if [[ $VENDOR == *"NVIDIA"* ]]; then
 		$HERE/.local/share/junest/bin/junest -n -b "$BINDS\
 			$ETC_RESOLV\
-			--bind /dev/dri /dev/dri\
-			--bind $DEV_NVIDIA /dev/nvidia\
+			--bind /dev/dri $JUNEST_HOME/dev/dri\
+			--bind $DEV_NVIDIA $JUNEST_HOME/dev/nvidia\
 			--bind /usr/lib/ConsoleKit $JUNEST_HOME/usr/lib/ConsoleKit\
 			--bind $DRIPATH $JUNEST_HOME/usr/lib/dri\
 			--bind /usr/libexec $JUNEST_HOME/usr/libexec\
