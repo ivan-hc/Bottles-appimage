@@ -372,4 +372,4 @@ mkdir -p ./$APP.AppDir/.junest/run/user
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-archimage3.2-pre1-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-archimage3.2-pre2-x86_64.AppImage
