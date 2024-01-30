@@ -92,18 +92,7 @@ cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
 # EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
 rm -R -f ./AppRun
 cat >> ./AppRun << 'EOF'
-#!/bin/sh
-HERE="$(dirname "$(readlink -f $0)")"
-export UNION_PRELOAD=$HERE
-export JUNEST_HOME=$HERE/.junest
-export PATH=$PATH:$HERE/.local/share/junest/bin
-mkdir -p $HOME/.cache
-if test -f /etc/resolv.conf; then
-	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
-fi
-EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV" -- $EXEC "$@"
-EOF
+wget -q https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/AppRun
 chmod a+x ./AppRun
 
 # REMOVE "READ-ONLY FILE SYSTEM" ERRORS
@@ -354,6 +343,8 @@ rm -R -f ./$APP.AppDir/.junest/home
 # ENABLE MOUNTPOINTS
 mkdir -p ./$APP.AppDir/.junest/home
 mkdir -p ./$APP.AppDir/.junest/media
+mkdir -p ./$APP.AppDir/.junest/dev/dri
+touch ./$APP.AppDir/.junest/dev/nvidia
 mkdir -p ./$APP.AppDir/.junest/usr/lib/ConsoleKit #
 mkdir -p ./$APP.AppDir/.junest/usr/lib/firmware #
 mkdir -p ./$APP.AppDir/.junest/usr/lib/locale
