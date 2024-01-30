@@ -39,9 +39,10 @@ Include = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 
 # CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
 _custom_mirrorlist(){
-	COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
+	#COUNTRY=$(curl -i ipinfo.io | grep country | cut -c 15- | cut -c -2)
 	rm -R ./.junest/etc/pacman.d/mirrorlist
-	wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist
+	wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
+	#wget -q https://archlinux.org/mirrorlist/?country="$(echo $COUNTRY)" -O - | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES MIRRORS OF YOUR COUNTY
 }
 _custom_mirrorlist
 
@@ -87,17 +88,30 @@ cp -r ./.junest/usr/share/icons/hicolor/512x512/apps/*$ICON* ./ 2>/dev/null
 cp -r ./.junest/usr/share/icons/hicolor/scalable/apps/*$ICON* ./ 2>/dev/null
 cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
 
-# ...AND FINALLY ADD THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
-# DOWNLOAD IT FROM https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/AppRun
+# ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
+# EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
 rm -R -f ./AppRun
-wget -q https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/AppRun
+cat >> ./AppRun << 'EOF'
+#!/bin/sh
+HERE="$(dirname "$(readlink -f $0)")"
+export UNION_PRELOAD=$HERE
+export JUNEST_HOME=$HERE/.junest
+export PATH=$PATH:$HERE/.local/share/junest/bin
+mkdir -p $HOME/.cache
+if test -f /etc/resolv.conf; then
+	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
+fi
+EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
+$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV" -- $EXEC "$@"
+EOF
 chmod a+x ./AppRun
 
 # REMOVE "READ-ONLY FILE SYSTEM" ERRORS
 sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
-sed -i 's#--bind "$HOME" "$HOME"#--bind /opt /opt --bind /usr/lib/locale /usr/lib/locale --bind /etc /etc --bind /usr/share/fonts /usr/share/fonts --bind /usr/share/themes /usr/share/themes --bind /mnt /mnt --bind /media /media --bind /home /home --bind /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
+sed -i 's#--bind "$HOME" "$HOME"#--bind /opt /opt --bind /usr/lib/locale /usr/lib/locale --bind /usr/share/fonts /usr/share/fonts --bind /usr/share/themes /usr/share/themes --bind /mnt /mnt --bind /media /media --bind /home /home --bind /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
+sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 
 # EXIT THE APPDIR
 cd ..
@@ -149,6 +163,7 @@ for arg in $DEPS4; do
 done
 
 # REMOVE SOME BLOATWARES
+echo Y | rm -R .f ./$APP.AppDir/.cache/yay/*
 find ./$APP.AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 find ./$APP.AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete #REMOVE ALL ADDITIONAL LOCALE FILES
 rm -R -f ./$APP.AppDir/.junest/etc/makepkg.conf
@@ -183,6 +198,7 @@ _savebins(){
 	mv ./$APP.AppDir/.junest/usr/bin/env ./save/
 	mv ./$APP.AppDir/.junest/usr/bin/sh ./save/
  	mv ./$APP.AppDir/.junest/usr/bin/tr ./save/
+   	mv ./$APP.AppDir/.junest/usr/bin/tty ./save/
 	for arg in $BINSAVED; do
 		for var in $arg; do
  			mv ./$APP.AppDir/.junest/usr/bin/*"$arg"* ./save/
@@ -190,7 +206,6 @@ _savebins(){
 	done
 	mv ./$APP.AppDir/.junest/usr/bin/* ./junest-backups/usr/bin/
 	mv ./save/* ./$APP.AppDir/.junest/usr/bin/
- 	rsync -av ./base/usr/bin/* ./$APP.AppDir/.junest/usr/bin/
 	rmdir save
 }
 _savebins 2> /dev/null
@@ -271,7 +286,6 @@ _liblibs(){
 _mvlibs(){
 	mv ./$APP.AppDir/.junest/usr/lib/* ./junest-backups/usr/lib/
 	mv ./save/* ./$APP.AppDir/.junest/usr/lib/
- 	rsync -av ./base/usr/lib/* ./$APP.AppDir/.junest/usr/lib/
 }
 
 _binlibs 2> /dev/null
@@ -309,15 +323,17 @@ _saveshare(){
 	done
 	mv ./$APP.AppDir/.junest/usr/share/* ./junest-backups/usr/share/
 	mv ./save/* ./$APP.AppDir/.junest/usr/share/
- 	rsync -av ./base/usr/share/* ./$APP.AppDir/.junest/usr/share/
-	rmdir save
+ 	rmdir save
 }
 _saveshare 2> /dev/null
 
+# RSYNC THE CONTENT OF THE APP'S PACKAGE
+rm -R -f ./base/.*
+rsync -av ./base/* ./$APP.AppDir/.junest/
+
 # RSYNC DEPENDENCES
-rsync -av ./deps/usr/bin/* ./$APP.AppDir/.junest/usr/bin/
-rsync -av ./deps/usr/lib/* ./$APP.AppDir/.junest/usr/lib/
-rsync -av ./deps/usr/share/* ./$APP.AppDir/.junest/usr/share/
+rm -R -f ./deps/.*
+rsync -av ./deps/* ./$APP.AppDir/.junest/
 
 # RESTORE 32-BIT LIBRARIES
 mkdir ./$APP.AppDir/.junest/usr/lib32
@@ -330,6 +346,7 @@ mv ./junest-backups/usr/lib/dri/* ./$APP.AppDir/.junest/usr/lib/dri/
 #mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
 rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
 sed -i 's/"faudio",/# "faudio",/g' ./$APP.AppDir/.junest/usr/share/bottles/bottles/backend/models/samples.py #Faudio is optional to use Bottles normally, in my testing this patch prevents the need to close Bottles to use it
+
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
@@ -364,4 +381,4 @@ mkdir -p ./$APP.AppDir/.junest/run/user
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-2-archimage3-pre2-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-archimage3.2-pre1-x86_64.AppImage
