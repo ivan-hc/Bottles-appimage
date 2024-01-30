@@ -130,6 +130,7 @@ sed -i -e 's#^#--bind / / --bind #' $HOME/.cache/libbindbinds
 
 #BINDS=$(cat $HOME/.cache/libbinds | tr "\n" " ")
 DEV_NVIDIA=$(find /dev -name nvidia*[0-9]* 2> /dev/null | head -1)
+DRI_NVIDIA=$(find /usr/lib -name *nvidia_*.so | head -1)
 
 # CHECK FOR LIBLLVM
 #HOST_LIBLLVM=$(find /usr/lib -name "*libLLVM*" | grep -v ".so.")
@@ -150,7 +151,7 @@ function _exec(){
 			--bind /dev/dri $JUNEST_HOME/dev/dri\
 			--bind $DEV_NVIDIA $JUNEST_HOME/dev/nvidia\
 			--bind /usr/lib/ConsoleKit $JUNEST_HOME/usr/lib/ConsoleKit\
-			--bind $DRIPATH $JUNEST_HOME/usr/lib/dri\
+			--bind $DRI_NVIDIA $JUNEST_HOME/usr/lib/dri/nvidia_dri.so\
 			--bind /usr/libexec $JUNEST_HOME/usr/libexec\
 			--bind /usr/lib/firmware $JUNEST_HOME/usr/lib/firmware\
 			--bind /usr/lib/modules $JUNEST_HOME/usr/lib/modules\
@@ -174,7 +175,6 @@ function _exec(){
 	else
 		$HERE/.local/share/junest/bin/junest -n -b "\
 			$ETC_RESOLV\
-			--bind $DRIPATH $JUNEST_HOME/usr/lib/dri\
 			--bind /usr/libexec $JUNEST_HOME/usr/libexec\
 			--bind /usr/lib/modules $JUNEST_HOME/usr/lib/modules\
 			--bind /usr/lib/xorg $JUNEST_HOME/usr/lib/xorg\
@@ -185,4 +185,5 @@ function _exec(){
 			" -- $EXEC "$@"
 	fi
 }
+_exec
 _exec
