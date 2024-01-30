@@ -345,6 +345,7 @@ mkdir -p ./$APP.AppDir/.junest/media
 mkdir -p ./$APP.AppDir/.junest/dev/dri
 touch ./$APP.AppDir/.junest/dev/nvidia
 mkdir -p ./$APP.AppDir/.junest/usr/lib/ConsoleKit #
+touch ./$APP.AppDir/.junest/usr/lib/dri/nvidia_dri.so
 mkdir -p ./$APP.AppDir/.junest/usr/lib/firmware #
 mkdir -p ./$APP.AppDir/.junest/usr/lib/locale
 mkdir -p ./$APP.AppDir/.junest/usr/lib/modules
