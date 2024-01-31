@@ -3,7 +3,7 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="ca-certificates cabextract ca-certificates faudio gamemode gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mesa-utils lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libeproxy libglvnd libnotify libva mesa mesa-utils p7zip pipewire procps-ng pulseaudio python python-yaml tar virglrenderer vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-radeon vulkan-swrast vulkan-tools vulkan-utility-libraries vulkan-virtio wine winetricks xorg-xdpyinfo zimg"
+DEPENDENCES="ca-certificates cabextract ca-certificates faudio gamemode glu gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mesa-utils lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libeproxy libglvnd libnotify libva libx11 mesa mesa-utils mesa-vdpau p7zip pipewire procps-ng pulseaudio python python-yaml tar virglrenderer vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-utility-libraries wine winetricks xorg-xdpyinfo zimg"
 BASICSTUFF="binutils gzip"
 COMPILERS="meson ninja blueprint-compiler"
 
@@ -91,7 +91,69 @@ cp -r ./.junest/usr/share/pixmaps/*$ICON* ./ 2>/dev/null
 # ...AND FINALLY CREATE THE APPRUN, IE THE MAIN SCRIPT TO RUN THE APPIMAGE!
 # EDIT THE FOLLOWING LINES IF YOU THINK SOME ENVIRONMENT VARIABLES ARE MISSING
 rm -R -f ./AppRun
-wget -q https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/AppRun
+cat >> ./AppRun << 'EOF'
+#!/bin/sh
+HERE="$(dirname "$(readlink -f $0)")"
+export UNION_PRELOAD=$HERE
+export JUNEST_HOME=$HERE/.junest
+export PATH=$PATH:$HERE/.local/share/junest/bin
+mkdir -p $HOME/.cache
+if test -f /etc/resolv.conf; then
+	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
+fi
+
+# DOWNLOAD THE RUNTIME OF BOTTLES
+if ! [ -d $HOME/.local/share/bottles/runtimes ]; then
+	mkdir -p $HOME/.local/share/bottles/runtimes
+	bottlesruntimedlurl=$(wget -q https://api.github.com/repos/bottlesdevs/runtime/releases -O - | grep browser_download_url | grep -i "runtime-" | cut -d '"' -f 4)
+	wget -q $bottlesruntimedlurl -O Bottles-runtime.tar.gz
+	tar xf ./Bottles-runtime.tar.gz -C $HOME/.local/share/bottles/runtimes/ 2> /dev/null
+	rm -R -f ./Bottles-runtime.tar.gz
+fi
+
+# FIND THE VENDOR
+VENDOR=$(glxinfo -B | grep "OpenGL vendor")
+if ! echo "$VENDOR" | grep -q "*Intel*"; then
+	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/intel_icd.i686.json:/usr/share/vulkan/icd.d/intel_icd.x86_64.json"
+	VENDORLIB="intel"
+	export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
+elif ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
+	export VK_ICD_FILENAMES=$(find /usr/share -name "*nvidia*json" | tr "\n" ":" | rev | cut -c 2- | rev)
+	VENDORLIB="nvidia"
+	export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
+elif ! echo "$VENDOR" | grep -q "*Radeon*"; then
+	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+	VENDORLIB="radeon"
+	export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
+fi
+
+EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
+
+if ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
+	echo "NVIDIA"
+	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
+		--bind /dev/dri $JUNEST_HOME/dev/dri\
+		--bind $(find /dev -name nvidia*[0-9]* 2> /dev/null | head -1) $JUNEST_HOME/dev/nvidia\
+		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
+		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
+		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
+		--bind $(find /usr/lib -name *libGLX_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libGLX_mesa*.so* -type f)\
+		--bind $(find /usr/lib -name *d3d*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *d3d*_dri.so* -type f)\
+		--bind $(find /usr/lib -name *zink*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *zink*_dri.so* -type f)\
+		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
+		" -- $EXEC "$@"
+else
+	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
+		--bind /dev/dri $JUNEST_HOME/dev/dri\
+		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
+		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
+		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
+		--bind $(find /usr/lib -name *libGLX_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libGLX_mesa*.so* -type f)\
+		--bind $(find /usr/lib -name *d3d*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib -name *d3d*_dri.so* -type f)\
+		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
+		" -- $EXEC "$@"
+fi
+EOF
 chmod a+x ./AppRun
 
 # REMOVE "READ-ONLY FILE SYSTEM" ERRORS
@@ -372,4 +434,4 @@ mkdir -p ./$APP.AppDir/.junest/run/user
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-archimage3.2-pre2-x86_64.AppImage
+mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-archimage3.2-pre3-x86_64.AppImage
