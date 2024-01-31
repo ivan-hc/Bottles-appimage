@@ -141,6 +141,7 @@ if ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
 		--bind $(find /usr/lib -name *zink*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *zink*_dri.so* -type f)\
 		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
 		--bind $(find /usr/lib -name *nvidia*drv.so* -type f) /usr/lib/dri/nvidia_dri.so\
+  		--bind $(find /usr/lib -name *libvdpau_nvidia.so* -type f) /usr/lib/libvdpau_nvidia.so\
 		" -- $EXEC "$@"
 else
 	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
@@ -431,6 +432,7 @@ mkdir -p ./$APP.AppDir/.junest/usr/share/vulkan #
 mkdir -p ./$APP.AppDir/.junest/usr/share/lightdm #
 mkdir -p ./$APP.AppDir/.junest/usr/share/xorg
 mkdir -p ./$APP.AppDir/.junest/run/user
+touch ./$APP.AppDir/.junest/usr/lib/libvdpau_nvidia.so
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
