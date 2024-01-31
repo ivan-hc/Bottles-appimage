@@ -171,7 +171,7 @@ function _exec(){
 			--bind /usr/share/nvidia $JUNEST_HOME/usr/share/nvidia\
 			--bind /usr/share/vulkan $JUNEST_HOME/usr/share/vulkan\
 			--bind /usr/src $JUNEST_HOME/usr/src\
-			" -- $EXEC "$@"
+			" -- env __GLX_VENDOR_LIBRARY_NAME=mesa MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink $EXEC "$@"
 	else
 		$HERE/.local/share/junest/bin/junest -n -b "\
 			$ETC_RESOLV\
