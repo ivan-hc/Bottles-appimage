@@ -132,8 +132,7 @@ EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | s
 if ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
 	echo "NVIDIA"
 	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
-		--bind /dev/dri $JUNEST_HOME/dev/dri\
-		--bind $(find /dev -name nvidia*[0-9]* 2> /dev/null | head -1) $JUNEST_HOME/dev/nvidia\
+		--bind /dev /dev/\
 		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
 		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
 		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
@@ -141,10 +140,11 @@ if ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
 		--bind $(find /usr/lib -name *d3d*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *d3d*_dri.so* -type f)\
 		--bind $(find /usr/lib -name *zink*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *zink*_dri.so* -type f)\
 		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
+		--bind $(find /usr/lib -name *nvidia*drv.so* -type f) /usr/lib/dri/nvidia_dri.so\
 		" -- $EXEC "$@"
 else
 	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
-		--bind /dev/dri $JUNEST_HOME/dev/dri\
+		--bind /dev /dev/\
 		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
 		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
 		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
