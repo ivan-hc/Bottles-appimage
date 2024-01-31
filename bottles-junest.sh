@@ -3,7 +3,7 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="ca-certificates cabextract ca-certificates faudio gamemode glu gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mesa-utils lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libeproxy libglvnd libnotify libva libx11 mesa mesa-utils mesa-vdpau p7zip pipewire procps-ng pulseaudio python python-yaml tar virglrenderer vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-utility-libraries wine winetricks xorg-xdpyinfo zimg"
+DEPENDENCES="ca-certificates cabextract ca-certificates faudio gamemode glu gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mesa-utils lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libeproxy libglvnd libnotify libva libx11 mesa mesa-utils mesa-vdpau p7zip pipewire procps-ng pulseaudio python python-yaml tar virglrenderer vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-tools vulkan-utility-libraries wine winetricks xorg-xdpyinfo zimg"
 BASICSTUFF="binutils gzip"
 COMPILERS="meson ninja blueprint-compiler"
 
@@ -132,12 +132,10 @@ EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | s
 if ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
 	echo "NVIDIA"
 	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
-		--bind /dev /dev/\
 		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
 		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
 		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
 		--bind $(find /usr/lib -name *libGLX_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libGLX_mesa*.so* -type f)\
-		--bind $(find /usr/lib -name *d3d*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *d3d*_dri.so* -type f)\
 		--bind $(find /usr/lib -name *zink*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *zink*_dri.so* -type f)\
 		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
 		--bind $(find /usr/lib -name *nvidia*drv.so* -type f) /usr/lib/dri/nvidia_dri.so\
@@ -145,12 +143,10 @@ if ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
 		" -- $EXEC "$@"
 else
 	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
-		--bind /dev /dev/\
 		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
 		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
 		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
 		--bind $(find /usr/lib -name *libGLX_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libGLX_mesa*.so* -type f)\
-		--bind $(find /usr/lib -name *d3d*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib -name *d3d*_dri.so* -type f)\
 		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
 		" -- $EXEC "$@"
 fi
