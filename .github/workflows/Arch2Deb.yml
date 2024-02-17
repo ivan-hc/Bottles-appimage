@@ -1,0 +1,50 @@
+name: Arch2Deb
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: build
+      run: |
+        sudo wget 'https://hunterwittenborn.com/keys/apt.asc' -O /etc/apt/trusted.gpg.d/hwittenborn.asc
+        echo 'deb [arch=all] https://repo.hunterwittenborn.com/debian/makedeb any main' | sudo tee /etc/apt/sources.list.d/makedeb.list
+        sudo apt update
+        sudo apt install mpm makedeb makedeb-db
+        wget -o https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=bottles -O PGKBUILD
+        makedeb PKGBUILD
+        mkdir dist
+        mv *.deb dist/
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Bottles-x86_64.deb
+        path: 'dist'
+        
+  release:
+      needs: [build]
+      permissions: write-all
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/download-artifact@v1
+          with:
+            name: Bottles-x86_64.deb
+
+        - name: release
+          uses: marvinpinto/action-automatic-releases@latest
+          with:
+            title: Experimental deb package
+            automatic_release_tag: experimental-deb-package
+            prerelease: true
+            draft: false
+            files: |
+              Bottles-x86_64.deb
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
