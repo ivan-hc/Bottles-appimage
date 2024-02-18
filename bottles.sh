@@ -6,6 +6,46 @@ APP=bottles
 mkdir -p tmp
 cd tmp
 
+function _archimage(){
+	DEPENDENCES="fvs"
+	BASICSTUFF="binutils gzip"
+	COMPILERS="meson ninja blueprint-compiler"
+	if ! test -f ./appimagetool; then
+		wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+		chmod a+x appimagetool
+	fi
+	mkdir archlinux-junest
+	cd archlinux-junest
+	# SET APPDIR AS A TEMPORARY $HOME DIRECTORY, THIS WILL DO ALL WORK INTO THE APPDIR
+	HOME="$(dirname "$(readlink -f $0)")" 
+	# DOWNLOAD AND INSTALL JUNEST (DON'T TOUCH THIS)
+	git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
+	wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
+	./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
+	rm -f junest-x86_64.tar.gz
+	# ENABLE MULTILIB (optional)
+	echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
+	# CUSTOM MIRRORLIST
+	rm -R ./.junest/etc/pacman.d/mirrorlist
+	wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
+	# BYPASS SIGNATURE CHECK LEVEL
+	sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
+	sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
+	# UPDATE ARCH LINUX IN JUNEST
+	./.local/share/junest/bin/junest -- sudo pacman -Syy
+	./.local/share/junest/bin/junest -- sudo pacman --noconfirm -Syu
+	# INSTALL THE PROGRAM USING YAY
+	./.local/share/junest/bin/junest -- yay -Syy
+	./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
+	./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS $DEPENDENCES $APP")
+	echo y | ./.local/share/junest/bin/junest -- yay --answerclean All --answerdiff All --noconfirm -Sa $APP patool
+	cd ..
+}
+
+if ! test -d ./archlinux-junest; then
+	_archimage
+fi
+
 # DOWNLOADING THE DEPENDENCIES
 if test -f ./appimagetool; then
 	echo " appimagetool already exists" 1> /dev/null
@@ -53,20 +93,11 @@ EOF
 # DOWNLOAD ALL THE NEEDED PACKAGES AND COMPILE THE APPDIR
 ./pkg2appimage ./recipe.yml
 
-# DOWNLOAD BOTTLES AND PATCH THE APPDIR
-package=$(wget -q https://builds.garudalinux.org/repos/chaotic-aur/x86_64/ -O - | grep -Po '(?<=href=")[^"]*' | grep bottles | head -1)
-wget https://builds.garudalinux.org/repos/chaotic-aur/x86_64/$package
-tar xf ./*tar.zst -C ./$APP/$APP.AppDir/
-rm -R -f ./*.zst
-
-rm -R -f ./$APP/$APP.AppDir/*.desktop
-cp ./$APP/$APP.AppDir/usr/share/applications/*bottles* ./
-
-# DOWNLOAD FVS AND PATCH THE APPDIR
-package=$(wget -q https://builds.garudalinux.org/repos/chaotic-aur/x86_64/ -O - | grep -Po '(?<=href=")[^"]*' | grep fvs | head -1)
-wget https://builds.garudalinux.org/repos/chaotic-aur/x86_64/$package
-tar xf ./*tar.zst -C ./$APP/$APP.AppDir/
-rm -R -f ./*.zst
+# PATCH THE APPDIR WITH YAY PACKAGES
+tar xf ./archlinux-junest/.cache/yay/bottles/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.cache/yay/fvs/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.cache/yay/python-steamgriddb/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.cache/yay/vkbasalt-cli/*tar.zst -C ./$APP/$APP.AppDir/
 
 # LIBUNIONPRELOAD
 wget https://github.com/project-portable/libunionpreload/releases/download/amd64/libunionpreload.so
