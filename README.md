@@ -2,7 +2,7 @@ Unofficial AppImage of "Bottles", an app to run Windows software and games on Li
 
 # How I've built it
 This AppImage is a mix of two of my projects:
-- AppImaGen, from here I provided a base of packages from Debian Stable for better compatibility with mre systems;
+- AppImaGen, from here I provided a base of packages from Debian Stable for better hardware compatibility;
 - ArchImage, from here I've built the missing packages from the AUR, then merged with the base.
 
 This is the hybrid AppImaGen/Archimage script I use to build Bottles:
