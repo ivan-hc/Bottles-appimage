@@ -1,7 +1,7 @@
 Unofficial AppImage of "Bottles", an app to run Windows software and games on Linux.
 
 # How I've built it
-This AppImage is a ix of two of my projects:
+This AppImage is a mix of two of my projects:
 - AppImaGen, from here I provided a base of packages from Debian Stable for better compatibility with mre systems;
 - ArchImage, from here I've built the missing packages from the AUR, then merged with the base.
 
