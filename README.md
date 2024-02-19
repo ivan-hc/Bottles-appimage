@@ -1,4 +1,7 @@
-Unofficial AppImage of "Bottles", an app to run Windows software and games on Linux.
+### Unofficial AppImage of "Bottles", an app to run Windows software and games on Linux.
+
+This repository creates and distributes the unofficial Appimage of Bottles built on top of JuNest (the lightweight Arch Linux based distro that runs, without root privileges, on top of any other Linux distro) and Debian Stable.
+
 
 # How I've built it
 This AppImage is a mix of two of my projects:
@@ -13,7 +16,6 @@ In brief, I've used JuNest (Arch Linux) only to compile the few essential packag
 ---------------------------------
 
 # Credits
-This repository creates and distributes the unofficial Appimage of Bottles built on top of JuNest (the lightweight Arch Linux based distro that runs, without root privileges, on top of any other Linux distro).
 
 - @mirkobrombin for all the patience and availability shown to me
 - ArchImaGen https://github.com/ivan-hc/AppImaGen
