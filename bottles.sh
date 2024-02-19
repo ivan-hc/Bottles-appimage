@@ -98,6 +98,8 @@ EOF
 
 # PATCH THE APPDIR WITH YAY PACKAGES
 tar xf ./archlinux-junest/.cache/yay/bottles/*tar.zst -C ./$APP/$APP.AppDir/
+VERSION=$(cat ./$APP/$APP.AppDir/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
+
 tar xf ./archlinux-junest/.cache/yay/fvs/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.cache/yay/patool/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.cache/yay/python-steamgriddb/*tar.zst -C ./$APP/$APP.AppDir/
@@ -158,9 +160,10 @@ cp ./$APP/$APP.AppDir/usr/share/applications/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/
 
 # DEBLOAT PACKAGE
 rm -R -f ./$APP/$APP.AppDir/usr/lib/gcc
+rm -R -f ./$APP/$APP.AppDir/.*
 
 # EXPORT THE APP TO AN APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP/$APP.AppDir
 cd ..
-mv ./tmp/*.AppImage .
+mv ./tmp/*.AppImage ./Bottles-"$VERSION"-x86_64.AppImage
 chmod a+x *.AppImage
