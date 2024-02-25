@@ -109,6 +109,9 @@ tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
 
+rm -f ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/*libcurl*
+rsync -av  ./archlinux-junest/.junest/usr/lib/*libcurl* ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/
+
 # LIBUNIONPRELOAD
 wget https://github.com/project-portable/libunionpreload/releases/download/amd64/libunionpreload.so
 chmod a+x libunionpreload.so
