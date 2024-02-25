@@ -125,12 +125,29 @@ HERE="$(dirname "$(readlink -f "${0}")")"
 export UNION_PRELOAD="${HERE}"
 export LD_PRELOAD="${HERE}"/libunionpreload.so
 export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/usr/lib/:"${HERE}"/usr/lib/i386-linux-gnu/:"${HERE}"/usr/lib/x86_64-linux-gnu/:"${HERE}"/lib/:"${HERE}"/lib/i386-linux-gnu/:"${HERE}"/lib/x86_64-linux-gnu/:"${LD_LIBRARY_PATH}"
-export PATH="${HERE}"/usr/bin/:"${HERE}"/usr/sbin/:"${HERE}"/usr/games/:"${HERE}"/bin/:"${HERE}"/sbin/:"${PATH}"
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:$HOME/.local/bin:"${HERE}"/usr/bin/:"${HERE}"/usr/sbin/:"${HERE}"/usr/games/:"${HERE}"/bin/:"${HERE}"/sbin/:"${PATH}"
 export PYTHONPATH="${HERE}"/usr/lib/python3.11/site-packages/:"${PYTHONPATH}"
 export PYTHONHOME="${HERE}"/usr/
 export XDG_DATA_DIRS="${HERE}"/usr/share/:"${XDG_DATA_DIRS}"
 export PERLLIB="${HERE}"/usr/share/perl5/:"${HERE}"/usr/lib/perl5/:"${PERLLIB}"
 export GSETTINGS_SCHEMA_DIR="${HERE}"/usr/share/glib-2.0/schemas/:"${GSETTINGS_SCHEMA_DIR}"
+
+VENDOR=$(glxinfo -B | grep "OpenGL vendor")
+if [[ $VENDOR == *"Intel"* ]]; then
+	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/intel_icd.i686.json:/usr/share/vulkan/icd.d/intel_icd.x86_64.json"
+	VENDORLIB="intel"
+	export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
+elif [[ $VENDOR == *"NVIDIA"* ]]; then
+        NVIDIAJSON=$(find /usr/share -name "*nvidia*json" | sed 's/ /:/g')
+	export VK_ICD_FILENAMES=$NVIDIAJSON
+	VENDORLIB="nvidia"
+	export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
+elif [[ $VENDOR == *"Radeon"* ]]; then
+	export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+	VENDORLIB="radeon"
+	export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
+fi
+
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 exec ${EXEC} "$@"
 EOF
