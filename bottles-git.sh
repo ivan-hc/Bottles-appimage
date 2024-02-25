@@ -91,6 +91,7 @@ ingredients:
     - ca-certificates
     - cabextract
     - network-manager
+    - gamescope
 EOF
 
 # DOWNLOAD ALL THE NEEDED PACKAGES AND COMPILE THE APPDIR
