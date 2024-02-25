@@ -109,6 +109,9 @@ tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
 
+rm -f ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/*libcurl*
+rsync -av  ./archlinux-junest/.junest/usr/lib/*libcurl* ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/
+
 # LIBUNIONPRELOAD
 wget https://github.com/project-portable/libunionpreload/releases/download/amd64/libunionpreload.so
 chmod a+x libunionpreload.so
@@ -126,7 +129,8 @@ export UNION_PRELOAD="${HERE}"
 export LD_PRELOAD="${HERE}"/libunionpreload.so
 export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/usr/lib/:"${HERE}"/usr/lib/i386-linux-gnu/:"${HERE}"/usr/lib/x86_64-linux-gnu/:"${HERE}"/lib/:"${HERE}"/lib/i386-linux-gnu/:"${HERE}"/lib/x86_64-linux-gnu/:"${LD_LIBRARY_PATH}"
 export PATH="${HERE}"/usr/bin/:"${HERE}"/usr/sbin/:"${HERE}"/usr/games/:"${HERE}"/bin/:"${HERE}"/sbin/:"${PATH}"
-export PYTHONPATH="${HERE}"/usr/lib/python3.11/site-packages/:"${PYTHONPATH}"
+PYVER=$(find $HERE/usr/lib -name *site-packages* | sort | grep -Eo [0-9].[0-9][0-9])
+export PYTHONPATH="${HERE}"/usr/lib/python"$PYVER"/site-packages/:"${PYTHONPATH}"
 export PYTHONHOME="${HERE}"/usr/
 export XDG_DATA_DIRS="${HERE}"/usr/share/:"${XDG_DATA_DIRS}"
 export PERLLIB="${HERE}"/usr/share/perl5/:"${HERE}"/usr/lib/perl5/:"${PERLLIB}"
