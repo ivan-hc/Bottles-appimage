@@ -109,8 +109,14 @@ tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
 
-rm -f ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/*libcurl*
-rsync -av  ./archlinux-junest/.junest/usr/lib/*libcurl* ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/
+function _rsync_pycurl(){
+	ARCH_PYVER=$(find ./archlinux-junest/.junest -name *site-packages* | sort | grep -Eo [0-9].[0-9][0-9])
+	DEB_PYVER=$(find ./$APP/$APP.AppDir -name *site-packages* | sort | grep -Eo [0-9].[0-9][0-9])
+	rsync -av ./archlinux-junest/.junest/usr/lib/python"$ARCH_PYVER"/site-packages/curl/* ./$APP/$APP.AppDir/usr/lib/python3/dist-packages/curl/
+	rsync -av ./$APP/$APP.AppDir/usr/lib/python3/dist-packages/*curl* ./$APP/$APP.AppDir/usr/lib/python"$DEB_PYVER"/site-packages/
+	rsync -av ./archlinux-junest/.junest/usr/share/doc/pycurl ./$APP/$APP.AppDir/usr/share/doc/
+}
+#_rsync_pycurl
 
 # LIBUNIONPRELOAD
 wget https://github.com/project-portable/libunionpreload/releases/download/amd64/libunionpreload.so
@@ -130,7 +136,7 @@ export LD_PRELOAD="${HERE}"/libunionpreload.so
 export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/usr/lib/:"${HERE}"/usr/lib/i386-linux-gnu/:"${HERE}"/usr/lib/x86_64-linux-gnu/:"${HERE}"/lib/:"${HERE}"/lib/i386-linux-gnu/:"${HERE}"/lib/x86_64-linux-gnu/:"${LD_LIBRARY_PATH}"
 export PATH="${HERE}"/usr/bin/:"${HERE}"/usr/sbin/:"${HERE}"/usr/games/:"${HERE}"/bin/:"${HERE}"/sbin/:"${PATH}"
 PYVER=$(find $HERE/usr/lib -name *site-packages* | sort | grep -Eo [0-9].[0-9][0-9])
-export PYTHONPATH="${HERE}"/usr/lib/python"$PYVER"/site-packages/:"${PYTHONPATH}"
+export PYTHONPATH="${HERE}"/usr/lib/python"$PYVER"/site-packages/:"${HERE}"/usr/lib/python3/dist-packages/:"${PYTHONPATH}"
 export PYTHONHOME="${HERE}"/usr/
 export XDG_DATA_DIRS="${HERE}"/usr/share/:"${XDG_DATA_DIRS}"
 export PERLLIB="${HERE}"/usr/share/perl5/:"${HERE}"/usr/lib/perl5/:"${PERLLIB}"
