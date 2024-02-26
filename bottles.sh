@@ -106,8 +106,10 @@ tar xf ./archlinux-junest/.cache/yay/patool/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.cache/yay/python-steamgriddb/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.cache/yay/vkbasalt-cli/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C ./$APP/$APP.AppDir/
-tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
+#tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
+PYVER=$(find ./$APP/$APP.AppDir/usr/lib -name *site-packages* | sort | grep -Eo [0-9].[0-9][0-9])
+rsync -av ./$APP/$APP.AppDir/usr/lib/python3/dist-packages/ ./$APP/$APP.AppDir/usr/lib/python"$PYVER"/site-packages/
 
 rm -f ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/*libcurl*
 rsync -av  ./archlinux-junest/.junest/usr/lib/*libcurl* ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu/
