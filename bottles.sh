@@ -63,6 +63,7 @@ chmod a+x ./appimagetool ./pkg2appimage
 rm -f ./recipe.yml
 
 PYTHONVERSION=$(ls ./archlinux-junest/.junest/usr/lib/ | sort | grep python | grep -v lib)
+LIBCURL=$(wget -q https://packages.debian.org/stable-backports/amd64/libcurl4/download -O - | grep Download | head -1 | grep -o -P '(?<=Selection -- ).*(?=</title)')
 
 # CREATING THE HEAD OF THE RECIPE
 echo "app: bottles
@@ -71,6 +72,8 @@ binpatch: true
 ingredients:
 
   dist: stable
+  script:
+    - wget http://ftp.debian.org/debian/pool/main/c/curl/$LIBCURL
   sources:
     - deb http://ftp.debian.org/debian/ stable main contrib non-free
     - deb http://security.debian.org/debian-security/ stable-security main contrib non-free
@@ -80,6 +83,7 @@ ingredients:
     - cabextract
     - gamescope
     - libadwaita-1-dev
+    - libcurl4
     - libffi-dev
     - libgtk-4-dev
     - libgtksourceview-5-dev
@@ -109,6 +113,12 @@ tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
 
+# SYMLINK LIBCURL
+cd ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu
+LIBCURL=$(ls . | sort | grep "libcurl.so" | head -1)
+ln -s ./$LIBCURL ./libcurl.so
+cd -
+
 # LIBUNIONPRELOAD
 wget https://github.com/project-portable/libunionpreload/releases/download/amd64/libunionpreload.so
 chmod a+x libunionpreload.so
@@ -123,7 +133,7 @@ cat >> ./$APP/$APP.AppDir/AppRun << 'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "${0}")")"
 export UNION_PRELOAD="${HERE}"
-export LD_PRELOAD="${HERE}"/libunionpreload.so
+export LD_PRELOAD="${HERE}"/libunionpreload.so:"${HERE}"/usr/lib/x86_64-linux-gnu/libcurl.so
 export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/usr/lib/:"${HERE}"/usr/lib/i386-linux-gnu/:"${HERE}"/usr/lib/x86_64-linux-gnu/:"${HERE}"/lib/:"${HERE}"/lib/i386-linux-gnu/:"${HERE}"/lib/x86_64-linux-gnu/:"${LD_LIBRARY_PATH}"
 export PATH="${HERE}"/usr/bin/:"${HERE}"/usr/sbin/:"${HERE}"/usr/games/:"${HERE}"/bin/:"${HERE}"/sbin/:"${PATH}"
 export PYTHONPATH="${HERE}"/usr/lib/PYTHONVERSION/site-packages/:"${PYTHONPATH}"
