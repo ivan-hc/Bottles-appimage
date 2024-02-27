@@ -18,7 +18,7 @@ In brief, I've used JuNest (Arch Linux) only to compile the few essential packag
 # Credits
 
 - @mirkobrombin for all the patience and availability shown to me
-- ArchImaGen https://github.com/ivan-hc/AppImaGen
+- AppImaGen https://github.com/ivan-hc/AppImaGen
 - JuNest https://github.com/fsquillace/junest
 - ArchImage https://github.com/ivan-hc/ArchImage
 
