@@ -90,22 +90,13 @@ ingredients:
     - libgtksourceview-5-dev
     - patool
     - $PYTHONVERSION
-    - $PYTHONVERSION-venv
     - python3-chardet
     - python3-gi
     - python3-icoextract
     - python3-pathvalidate
     - python3-pycurl
     - python3-requests
-    - python3-yaml
-    
-script:
- - virtualenv --python=python3 usr
- - ./usr/bin/pip3 install fvs
- - ./usr/bin/pip3 install orjson
- #- ./usr/bin/pip3 install pycurl
- - ./usr/bin/pip3 install python-steamgriddb
- - ./usr/bin/pip3 install vkbasalt-cli" >> recipe.yml
+    - python3-yaml" >> recipe.yml
 
 # DOWNLOAD ALL THE NEEDED PACKAGES AND COMPILE THE APPDIR
 ./pkg2appimage ./recipe.yml
@@ -114,6 +105,11 @@ script:
 tar xf ./archlinux-junest/.cache/yay/bottles/*tar.zst -C ./$APP/$APP.AppDir/
 VERSION=$(cat ./$APP/$APP.AppDir/.PKGINFO | grep pkgver | cut -c 10- | sed 's@.*:@@')
 
+tar xf ./archlinux-junest/.cache/yay/fvs/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.cache/yay/patool/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.cache/yay/python-steamgriddb/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.cache/yay/vkbasalt-cli/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
 
