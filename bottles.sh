@@ -88,23 +88,23 @@ ingredients:
     - libffi-dev
     - libgtk-4-dev
     - libgtksourceview-5-dev
+    - patool
     - $PYTHONVERSION
     - $PYTHONVERSION-venv
     - python3-chardet
     - python3-gi
+    - python3-icoextract
+    - python3-pathvalidate
     - python3-pycurl
+    - python3-requests
     - python3-yaml
     
 script:
  - virtualenv --python=python3 usr
  - ./usr/bin/pip3 install fvs
- - ./usr/bin/pip3 install icoextract
  - ./usr/bin/pip3 install orjson
- - ./usr/bin/pip3 install pathvalidate
- - ./usr/bin/pip3 install patool
  #- ./usr/bin/pip3 install pycurl
  - ./usr/bin/pip3 install python-steamgriddb
- - ./usr/bin/pip3 install requests
  - ./usr/bin/pip3 install vkbasalt-cli" >> recipe.yml
 
 # DOWNLOAD ALL THE NEEDED PACKAGES AND COMPILE THE APPDIR
