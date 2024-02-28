@@ -90,13 +90,13 @@ ingredients:
     - libgtksourceview-5-dev
     - $PYTHONVERSION
     - $PYTHONVERSION-venv
+    - python3-chardet
     - python3-gi
     - python3-pycurl
     - python3-yaml
     
 script:
  - virtualenv --python=python3 usr
- - ./usr/bin/pip3 install chardet
  - ./usr/bin/pip3 install fvs
  - ./usr/bin/pip3 install icoextract
  - ./usr/bin/pip3 install orjson
