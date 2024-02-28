@@ -15,7 +15,7 @@ jobs:
     - name: build
       run: |
         sudo apt update
-        sudo apt install libfuse2
+        sudo apt install libfuse2 python3-pip virtualenv
         wget https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/bottles.sh
         chmod a+x ./bottles.sh
         ./bottles.sh
