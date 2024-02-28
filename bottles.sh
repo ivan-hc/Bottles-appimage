@@ -83,7 +83,6 @@ ingredients:
     - cabextract
     - curl
     - gamescope
-    - imagemagick
     - libadwaita-1-dev
     - libcurl4
     - libffi-dev
