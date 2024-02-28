@@ -2,6 +2,9 @@
 
 This repository creates and distributes the unofficial Appimage of Bottles built on top of JuNest (the lightweight Arch Linux based distro that runs, without root privileges, on top of any other Linux distro) and Debian Stable.
 
+## Requirements
+- imagemagick
+- glibc version of [Debian Stable](https://packages.debian.org/stable/source/glibc) or newer
 
 # How I've built it
 This AppImage is a mix of two of my projects:
