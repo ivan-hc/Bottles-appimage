@@ -2,10 +2,6 @@
 
 This repository creates and distributes the unofficial Appimage of Bottles built on top of JuNest (the lightweight Arch Linux based distro that runs, without root privileges, on top of any other Linux distro) and Debian Stable.
 
-## Requirements
-- imagemagick
-- glibc version of [Debian Stable](https://packages.debian.org/stable/source/glibc) or newer
-
 # How I've built it
 This AppImage is a mix of two of my projects:
 - AppImaGen, from here I provided a base of packages from Debian Stable for better hardware compatibility;
@@ -15,6 +11,15 @@ This is the hybrid AppImaGen/Archimage script I use to build Bottles:
 - https://github.com/ivan-hc/Bottles-appimage/blob/main/bottles.sh
 
 In brief, I've used JuNest (Arch Linux) only to compile the few essential packages, including Bottles itself (from [here](https://aur.archlinux.org/packages/bottles)), then a classic AppImage construction as a Base gives the correct compatibility with the system's drivers, including old Nvidia GPUs.
+
+## Requirements
+- imagemagick
+- glibc version of [Debian Stable](https://packages.debian.org/stable/source/glibc) or newer
+
+### Build requirements
+If you wish to made it work for Linux distros older but still supported, you need to include:
+- Python version equal to the one availeble for Arch Linux in its official repository (see [python](https://archlinux.org/packages/core/x86_64/python/)), being Bottles only available as AUR package;
+- libcurl version updated to the one compiled for pycurl in Arch Linux (see [curl](https://archlinux.org/packages/core/x86_64/curl/)), also this must be in LD_PRELOAD to made it work over the one installed system wide. Or at least you need to compile pycurl by yourself by including openssl support.
 
 ---------------------------------
 
