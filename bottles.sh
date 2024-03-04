@@ -7,7 +7,7 @@ mkdir -p tmp
 cd tmp
 
 function _archimage(){
-	DEPENDENCES="fvs"
+	DEPENDENCES="fvs python-gobject"
 	BASICSTUFF="binutils gzip"
 	COMPILERS="meson ninja blueprint-compiler"
 	if ! test -f ./appimagetool; then
@@ -109,6 +109,7 @@ tar xf ./archlinux-junest/.cache/yay/fvs/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.cache/yay/patool/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.cache/yay/python-steamgriddb/*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.cache/yay/vkbasalt-cli/*tar.zst -C ./$APP/$APP.AppDir/
+tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-gobject-*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
