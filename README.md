@@ -18,7 +18,7 @@ In brief, I've used JuNest (Arch Linux) only to compile the few essential packag
 
 ### Build requirements
 If you wish to made it work for Linux distros older but still supported, you need to include:
-- Python version equal to the one availeble for Arch Linux in its official repository (see [python](https://archlinux.org/packages/core/x86_64/python/)), being Bottles only available as AUR package;
+- Python version equal to the one available for Arch Linux in its official repository (see [python](https://archlinux.org/packages/core/x86_64/python/)), being Bottles only available as AUR package;
 - libcurl version updated to the one compiled for pycurl in Arch Linux (see [curl](https://archlinux.org/packages/core/x86_64/curl/)), also this must be in LD_PRELOAD to made it work over the one installed system wide. Or at least you need to compile pycurl by yourself by including openssl support.
 
 ---------------------------------
