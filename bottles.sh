@@ -146,7 +146,7 @@ export GSETTINGS_SCHEMA_DIR="${HERE}"/usr/share/glib-2.0/schemas/:"${GSETTINGS_S
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 case "$1" in
 	'') $HERE/usr/bin/${EXEC};;
-	*) $HERE/usr/bin/${EXEC}-cli "$@";;
+	*) $HERE/usr/bin/bottles-cli "$@";;
 esac
 EOF
 sed -i "s/PYTHONVERSION/$PYTHONVERSION/g" ./$APP/$APP.AppDir/AppRun
@@ -182,5 +182,5 @@ rm -R -f ./$APP/$APP.AppDir/.*
 # EXPORT THE APP TO AN APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP/$APP.AppDir
 cd ..
-mv ./tmp/*.AppImage ./Bottles-"$VERSION"-x86_64.AppImage
+mv ./tmp/*.AppImage ./Bottles-"$VERSION"-0.1-x86_64.AppImage
 chmod a+x *.AppImage
