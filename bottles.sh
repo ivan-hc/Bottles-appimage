@@ -143,7 +143,10 @@ export XDG_DATA_DIRS="${HERE}"/usr/share/:"${XDG_DATA_DIRS}"
 export PERLLIB="${HERE}"/usr/share/perl5/:"${HERE}"/usr/lib/perl5/:"${PERLLIB}"
 export GSETTINGS_SCHEMA_DIR="${HERE}"/usr/share/glib-2.0/schemas/:"${GSETTINGS_SCHEMA_DIR}"
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-exec ${EXEC} "$@"
+case "$1" in
+	'') $HERE/usr/bin/${EXEC};;
+	*) $HERE/usr/bin/${EXEC}-cli "$@";;
+esac
 EOF
 sed -i "s/PYTHONVERSION/$PYTHONVERSION/g" ./$APP/$APP.AppDir/AppRun
 	
