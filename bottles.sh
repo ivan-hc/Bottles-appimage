@@ -113,6 +113,7 @@ tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-gobject-*tar.zst -
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C ./$APP/$APP.AppDir/
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
+rsync -av ./archlinux-junest/.junest/usr/lib/$PYTHONVERSION/site-packages/setuptools ./$APP/$APP.AppDir/usr/lib/$PYTHONVERSION/site-packages/
 
 # SYMLINK LIBCURL
 cd ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu
