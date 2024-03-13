@@ -3,7 +3,7 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="ca-certificates cabextract ca-certificates faudio gamemode glu gputils imagemagick lib32-alsa-lib lib32-faudio lib32-flac lib32-libao lib32-libglvnd lib32-libpulse lib32-mesa lib32-mesa-utils lib32-mpg123 lib32-pipewire lib32-vkd3d lib32-vulkan-icd-loader libeproxy libglvnd libnotify libva libx11 mesa mesa-utils mesa-vdpau p7zip pipewire procps-ng pulseaudio python python-yaml tar virglrenderer vkd3d vulkan-extra-layers vulkan-extra-tools vulkan-headers vulkan-icd-loader vulkan-icd-loader vulkan-intel vulkan-mesa-layers vulkan-tools vulkan-utility-libraries wine winetricks xorg-xdpyinfo zimg"
+DEPENDENCES="ca-certificates cabextract faudio gamemode imagemagick lib32-mpg123 libeproxy libselinux libx11 p7zip pipewire procps-ng pulseaudio python python-yaml tar wine winetricks xorg-xdpyinfo zimg"
 BASICSTUFF="binutils gzip"
 COMPILERS="meson ninja blueprint-compiler"
 
@@ -30,12 +30,13 @@ echo "
 Include = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 
 # ENABLE CHAOTIC-AUR
-###./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-###./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
-###./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-###echo "
-###[chaotic-aur]
-###Include = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
+./.local/share/junest/bin/junest -- sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+./.local/share/junest/bin/junest -- sudo pacman-key --lsign-key 3056513887B78AEB
+./.local/share/junest/bin/junest -- sudo pacman-key --populate chaotic
+./.local/share/junest/bin/junest -- sudo pacman --noconfirm -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+echo "
+[chaotic-aur]
+Include = /etc/pacman.d/chaotic-mirrorlist" >> ./.junest/etc/pacman.conf
 
 # CUSTOM MIRRORLIST, THIS SHOULD SPEEDUP THE INSTALLATION OF THE PACKAGES IN PACMAN (COMMENT EVERYTHING TO USE THE DEFAULT MIRROR)
 _custom_mirrorlist(){
@@ -94,13 +95,6 @@ rm -R -f ./AppRun
 cat >> ./AppRun << 'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f $0)")"
-export UNION_PRELOAD=$HERE
-export JUNEST_HOME=$HERE/.junest
-export PATH=$PATH:$HERE/.local/share/junest/bin
-mkdir -p $HOME/.cache
-if test -f /etc/resolv.conf; then
-	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
-fi
 
 # DOWNLOAD THE RUNTIME OF BOTTLES
 if ! [ -d $HOME/.local/share/bottles/runtimes ]; then
@@ -127,29 +121,22 @@ elif ! echo "$VENDOR" | grep -q "*Radeon*"; then
 	export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
 fi
 
-EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
-
-if ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
-	echo "NVIDIA"
-	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
-		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
-		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
-		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
-		--bind $(find /usr/lib -name *libGLX_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libGLX_mesa*.so* -type f)\
-		--bind $(find /usr/lib -name *zink*_dri.so* -type f) $(find $JUNEST_HOME/usr/lib/dri -name *zink*_dri.so* -type f)\
-		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
-		--bind $(find /usr/lib -name *nvidia*drv.so* -type f) /usr/lib/dri/nvidia_dri.so\
-  		--bind $(find /usr/lib -name *libvdpau_nvidia.so* -type f) /usr/lib/libvdpau_nvidia.so\
-		" -- $EXEC "$@"
-else
-	$HERE/.local/share/junest/bin/junest -n -b "$ETC_RESOLV\
-		--bind $(find /usr/lib -name libEGL.so* -type f) $(find $JUNEST_HOME/usr/lib -name libEGL.so* -type f)\
-		--bind $(find /usr/lib -name libGLESv2* -type f) $(find $JUNEST_HOME/usr/lib -name libGLESv2* -type f)\
-		--bind $(find /usr/lib -name *libEGL_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libEGL_mesa*.so* -type f)\
-		--bind $(find /usr/lib -name *libGLX_mesa*.so* -type f) $(find $JUNEST_HOME/usr/lib -name *libGLX_mesa*.so* -type f)\
-		--bind $(find /usr/lib -maxdepth 2 -name vdpau) $(find $JUNEST_HOME/usr/lib -maxdepth 2 -name vdpau)\
-		" -- $EXEC "$@"
+export UNION_PRELOAD=$HERE
+export JUNEST_HOME=$HERE/.junest
+export PATH=$PATH:$HERE/.local/share/junest/bin
+if test -d /media; then
+	MNT_MEDIA=' --bind /media /media '
 fi
+if test -f /etc/resolv.conf; then
+	ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf ' # NEEDED TO CONNECT THE INTERNET
+fi
+
+export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:$JUNEST_HOME/lib/:$JUNEST_HOME/lib64/:$JUNEST_HOME/usr/lib/
+#export LD_PRELOAD=$(find /usr/lib -name libc.so.6):$(find /usr/lib -name ld-linux*):$(find /usr/lib -name libpcre* | tail -1):$(find /usr/lib -name libselinux.so*):$(find /usr/lib -name libacl.so* | tail -1)
+
+BINDS=" $MNT_MEDIA $ETC_RESOLV "
+EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
+$HERE/.local/share/junest/bin/junest -n -b "$BINDS" -- $EXEC "$@"
 EOF
 chmod a+x ./AppRun
 
@@ -157,7 +144,7 @@ chmod a+x ./AppRun
 sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
 sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
-sed -i 's#--bind "$HOME" "$HOME"#--bind /opt /opt --bind /usr/lib/locale /usr/lib/locale --bind /usr/share/fonts /usr/share/fonts --bind /usr/share/themes /usr/share/themes --bind /mnt /mnt --bind /media /media --bind /home /home --bind /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
+sed -i 's#--bind "$HOME" "$HOME"#--bind /opt /opt --bind /usr/lib/locale /usr/lib/locale --bind /usr/share/fonts /usr/share/fonts --bind /usr/share/themes /usr/share/themes --bind /mnt /mnt --bind /home /home --bind /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
 sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 
 # EXIT THE APPDIR
@@ -223,9 +210,9 @@ rm -R -f ./$APP.AppDir/.junest/var/* #REMOVE ALL PACKAGES DOWNLOADED WITH THE PA
 # WE WILL MOVE EXCESS CONTENT TO BACKUP FOLDERS (STEP 1)
 # THE AFFECTED DIRECTORIES WILL BE /usr/bin (STEP 2), /usr/lib (STEP 3) AND /usr/share (STEP 4)
 
-BINSAVED="certificates cut grep mesa patool py qemu rm wine vk vulkan xz" # Enter here keywords to find and save in /usr/bin
-SHARESAVED="certificates adwaita appstream gnome gtk icons mesa themes vk vulkan xml" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
-LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d decor GL gl gnome gtk libgraphene lzo mesa module nvidia pau repository selinux stemmer vk vulkan wine wine64 xml" # Enter here keywords or file/folder names to save in /usr/lib
+BINSAVED="certificates cut grep patool py rm wine xz" # Enter here keywords to find and save in /usr/bin
+SHARESAVED="certificates adwaita appstream gnome gtk icons themes vk xml" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
+LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d decor GL gl gnome gtk libgraphene lzo module pau repository selinux stemmer wine xml" # Enter here keywords or file/folder names to save in /usr/lib
 
 # STEP 1, CREATE A BACKUP FOLDER WHERE TO SAVE THE FILES TO BE DISCARDED (USEFUL FOR TESTING PURPOSES)
 mkdir -p ./junest-backups/usr/bin
@@ -386,14 +373,10 @@ rsync -av ./deps/* ./$APP.AppDir/.junest/
 mkdir ./$APP.AppDir/.junest/usr/lib32
 rsync -av ./lib32/* ./$APP.AppDir/.junest/usr/lib32/
 
-# INCLUDE ALL DRIVERS
-mv ./junest-backups/usr/lib/dri/* ./$APP.AppDir/.junest/usr/lib/dri/
-
 # ADDITIONAL REMOVALS
 #mv ./$APP.AppDir/.junest/usr/lib/libLLVM-* ./junest-backups/usr/lib/ #INCLUDED IN THE COMPILATION PHASE, CAN SOMETIMES BE EXCLUDED FOR DAILY USE
 rm -R -f ./$APP.AppDir/.junest/usr/lib/python*/__pycache__/* #IF PYTHON IS INSTALLED, REMOVING THIS DIRECTORY CAN SAVE SEVERAL MEGABYTES
 sed -i 's/"faudio",/# "faudio",/g' ./$APP.AppDir/.junest/usr/share/bottles/bottles/backend/models/samples.py #Faudio is optional to use Bottles normally, in my testing this patch prevents the need to close Bottles to use it
-
 
 # REMOVE THE INBUILT HOME
 rm -R -f ./$APP.AppDir/.junest/home
@@ -401,35 +384,13 @@ rm -R -f ./$APP.AppDir/.junest/home
 # ENABLE MOUNTPOINTS
 mkdir -p ./$APP.AppDir/.junest/home
 mkdir -p ./$APP.AppDir/.junest/media
-mkdir -p ./$APP.AppDir/.junest/dev/dri
-touch ./$APP.AppDir/.junest/dev/nvidia
-mkdir -p ./$APP.AppDir/.junest/usr/lib/ConsoleKit #
-touch ./$APP.AppDir/.junest/usr/lib/dri/nvidia_dri.so
-mkdir -p ./$APP.AppDir/.junest/usr/lib/firmware #
 mkdir -p ./$APP.AppDir/.junest/usr/lib/locale
-mkdir -p ./$APP.AppDir/.junest/usr/lib/modules
-mkdir -p ./$APP.AppDir/.junest/usr/lib/nvidia
-mkdir -p ./$APP.AppDir/.junest/usr/lib/systemd #
-mkdir -p ./$APP.AppDir/.junest/usr/lib/udev #
-mkdir -p ./$APP.AppDir/.junest/usr/lib/vdpau #
-mkdir -p ./$APP.AppDir/.junest/usr/lib/xorg
-mkdir -p ./$APP.AppDir/.junest/usr/libexec
-mkdir -p ./$APP.AppDir/.junest/usr/share/bug #
-mkdir -p ./$APP.AppDir/.junest/usr/share/dbus-1
-mkdir -p ./$APP.AppDir/.junest/usr/share/doc #
-mkdir -p ./$APP.AppDir/.junest/usr/share/egl #
 mkdir -p ./$APP.AppDir/.junest/usr/share/fonts
-mkdir -p ./$APP.AppDir/.junest/usr/share/glvnd
-mkdir -p ./$APP.AppDir/.junest/usr/share/lintian #
-mkdir -p ./$APP.AppDir/.junest/usr/share/man #
-mkdir -p ./$APP.AppDir/.junest/usr/share/nvidia #
 mkdir -p ./$APP.AppDir/.junest/usr/share/themes
-mkdir -p ./$APP.AppDir/.junest/usr/share/vulkan #
-mkdir -p ./$APP.AppDir/.junest/usr/share/lightdm #
-mkdir -p ./$APP.AppDir/.junest/usr/share/xorg
 mkdir -p ./$APP.AppDir/.junest/run/user
-touch ./$APP.AppDir/.junest/usr/lib/libvdpau_nvidia.so
+mkdir -p ./$APP.AppDir/.junest/usr/lib/xorg
+mkdir -p ./$APP.AppDir/.junest/usr/share/xorg
 
 # CREATE THE APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP.AppDir
-mv ./*AppImage ./Bottles_"$VERSION"_Unofficial-Experimental-archimage3.2-pre3-x86_64.AppImage
+mv ./*AppImage ./"$(cat ./$APP.AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.2-x86_64.AppImage
