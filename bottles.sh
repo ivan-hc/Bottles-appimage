@@ -121,6 +121,13 @@ LIBCURL=$(ls . | sort | grep "libcurl.so" | head -1)
 ln -s ./$LIBCURL ./libcurl.so
 cd -
 
+# SYMLINK MAIN DIRECTORIES
+cd ./$APP/$APP.AppDir
+ln -s /home ./home
+ln -s /media ./media
+ln -s /mnt ./mnt
+cd -
+
 # LIBUNIONPRELOAD
 wget https://github.com/project-portable/libunionpreload/releases/download/amd64/libunionpreload.so
 chmod a+x libunionpreload.so
@@ -182,5 +189,5 @@ rm -R -f ./$APP/$APP.AppDir/.*
 # EXPORT THE APP TO AN APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP/$APP.AppDir
 cd ..
-mv ./tmp/*.AppImage ./Bottles-"$VERSION"-0.1-x86_64.AppImage
+mv ./tmp/*.AppImage ./Bottles-"$VERSION"-0.2-x86_64.AppImage
 chmod a+x *.AppImage
