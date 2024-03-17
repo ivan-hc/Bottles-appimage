@@ -8,7 +8,7 @@ cd tmp
 
 function _archimage(){
 	DEPENDENCES="fvs python-gobject"
-	BASICSTUFF="binutils gzip"
+	BASICSTUFF="binutils debugedit gzip"
 	COMPILERS="meson ninja blueprint-compiler"
 	if ! test -f ./appimagetool; then
 		wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
@@ -37,6 +37,7 @@ function _archimage(){
 	# INSTALL THE PROGRAM USING YAY
 	./.local/share/junest/bin/junest -- yay -Syy
 	./.local/share/junest/bin/junest -- gpg --keyserver keyserver.ubuntu.com --recv-key C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF # UNCOMMENT IF YOU USE THE AUR
+	./.local/share/junest/bin/junest -- yay --noconfirm -S $(echo "$BASICSTUFF")
 	./.local/share/junest/bin/junest -- yay --noconfirm -S gnu-free-fonts $(echo "$BASICSTUFF $COMPILERS $DEPENDENCES $APP")
 	echo y | ./.local/share/junest/bin/junest -- yay --answerclean All --answerdiff All --noconfirm -Sa $APP patool
 	cd ..
