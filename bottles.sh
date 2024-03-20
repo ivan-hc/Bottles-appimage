@@ -11,7 +11,7 @@ function _archimage(){
 	BASICSTUFF="binutils debugedit gzip"
 	COMPILERS="meson ninja blueprint-compiler"
 	if ! test -f ./appimagetool; then
-		wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+		wget -q $(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | grep -v zsync | grep -i continuous | grep -i appimagetool | grep -i x86_64 | grep browser_download_url | cut -d '"' -f 4 | head -1) -O appimagetool
 		chmod a+x appimagetool
 	fi
 	mkdir archlinux-junest
@@ -188,7 +188,7 @@ rm -R -f ./$APP/$APP.AppDir/usr/lib/gcc
 rm -R -f ./$APP/$APP.AppDir/.*
 
 # EXPORT THE APP TO AN APPIMAGE
-ARCH=x86_64 ./appimagetool -n ./$APP/$APP.AppDir
+ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./$APP/$APP.AppDir
 cd ..
-mv ./tmp/*.AppImage ./Bottles-"$VERSION"-0.2-x86_64.AppImage
+mv ./tmp/*.AppImage ./Bottles-"$VERSION"-Type3-x86_64.AppImage
 chmod a+x *.AppImage
