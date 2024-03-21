@@ -3,6 +3,8 @@ This repository creates and distributes the unofficial Appimage of [Bottles](htt
 
 You can download it from https://github.com/ivan-hc/Bottles-appimage/releases/tag/continuous
 
+This uses the more recent Type3 AppImage model, so you don't need `libfuse2` installed on your system.
+
 # System requirements to run it
 - `imagemagick` must be installed from your package manager
 - `glibc` version of [Debian Stable](https://packages.debian.org/stable/source/glibc) or newer (so this should work well on newer distributions)
