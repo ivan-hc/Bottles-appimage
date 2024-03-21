@@ -115,6 +115,7 @@ tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-orjson-*tar.zst -C
 tar xf ./archlinux-junest/.junest/var/cache/pacman/pkg/python-pycurl-*tar.zst -C ./$APP/$APP.AppDir/
 rsync -av ./archlinux-junest/.junest/usr/share/glib-2.0/* ./$APP/$APP.AppDir/usr/share/glib-2.0/
 rsync -av ./archlinux-junest/.junest/usr/lib/$PYTHONVERSION/site-packages/setuptools ./$APP/$APP.AppDir/usr/lib/$PYTHONVERSION/site-packages/
+rsync -av ./archlinux-junest/.junest/usr/lib/$PYTHONVERSION/lib-dynload/_socket* ./$APP/$APP.AppDir/usr/lib/$PYTHONVERSION/lib-dynload/
 
 # SYMLINK LIBCURL
 cd ./$APP/$APP.AppDir/usr/lib/x86_64-linux-gnu
@@ -146,7 +147,7 @@ export UNION_PRELOAD="${HERE}"
 export LD_PRELOAD="${HERE}"/libunionpreload.so:"${HERE}"/usr/lib/x86_64-linux-gnu/libcurl.so
 export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/usr/lib/:"${HERE}"/usr/lib/i386-linux-gnu/:"${HERE}"/usr/lib/x86_64-linux-gnu/:"${HERE}"/lib/:"${HERE}"/lib/i386-linux-gnu/:"${HERE}"/lib/x86_64-linux-gnu/:"${LD_LIBRARY_PATH}"
 export PATH="${HERE}"/usr/bin/:"${HERE}"/usr/sbin/:"${HERE}"/usr/games/:"${HERE}"/bin/:"${HERE}"/sbin/:"${PATH}"
-export PYTHONPATH="${HERE}"/usr/lib/PYTHONVERSION/site-packages/:"${PYTHONPATH}"
+export PYTHONPATH="${HERE}"/usr/lib/PYTHONVERSION/site-packages/:"${HERE}"/usr/lib/PYTHONVERSION/lib-dynload/:"${PYTHONPATH}"
 export PYTHONHOME="${HERE}"/usr/
 export XDG_DATA_DIRS="${HERE}"/usr/share/:"${XDG_DATA_DIRS}"
 export PERLLIB="${HERE}"/usr/share/perl5/:"${HERE}"/usr/lib/perl5/:"${PERLLIB}"
