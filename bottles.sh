@@ -146,14 +146,23 @@ cat >> ./$APP/$APP.AppDir/AppRun << 'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "${0}")")"
 export UNION_PRELOAD="${HERE}"
-export LD_PRELOAD="${HERE}"/libunionpreload.so:"${HERE}"/usr/lib/x86_64-linux-gnu/libcurl.so
-export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${HERE}"/usr/lib/:"${HERE}"/usr/lib/i386-linux-gnu/:"${HERE}"/usr/lib/x86_64-linux-gnu/:"${HERE}"/lib/:"${HERE}"/lib/i386-linux-gnu/:"${HERE}"/lib/x86_64-linux-gnu/:"${LD_LIBRARY_PATH}"
+export LD_PRELOAD="${HERE}"/libunionpreload.so
 export PATH="${HERE}"/usr/bin/:"${HERE}"/usr/sbin/:"${HERE}"/usr/games/:"${HERE}"/bin/:"${HERE}"/sbin/:"${PATH}"
 export PYTHONPATH="${HERE}"/usr/lib/PYTHONVERSION/site-packages/:"${HERE}"/usr/lib/PYTHONVERSION/lib-dynload/:"${PYTHONPATH}"
 export PYTHONHOME="${HERE}"/usr/
 export XDG_DATA_DIRS="${HERE}"/usr/share/:"${XDG_DATA_DIRS}"
 export PERLLIB="${HERE}"/usr/share/perl5/:"${HERE}"/usr/lib/perl5/:"${PERLLIB}"
 export GSETTINGS_SCHEMA_DIR="${HERE}"/usr/share/glib-2.0/schemas/:"${GSETTINGS_SCHEMA_DIR}"
+
+# DOWNLOAD THE RUNTIME OF BOTTLES
+if ! [ -d $HOME/.local/share/bottles/runtimes ]; then
+	mkdir -p $HOME/.local/share/bottles/runtimes $HOME/.cache
+	bottlesruntimedlurl=$(curl -Ls https://api.github.com/repos/bottlesdevs/runtime/releases | sed 's/[()",{} ]/\n/g' | grep -oi "http.*runtime-.*" | cut -d '"' -f 4)
+	wget -q $bottlesruntimedlurl -O $HOME/.cache/Bottles-runtime.tar.gz | echo "Downloading the runtime of Bottles..."
+	tar xf $HOME/.cache/Bottles-runtime.tar.gz -C $HOME/.local/share/bottles/runtimes/ 2> /dev/null
+	rm -R -f $HOME/.cache/Bottles-runtime.tar.gz
+fi
+
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 case "$1" in
 	'') $HERE/usr/bin/${EXEC};;
