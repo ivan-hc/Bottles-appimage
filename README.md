@@ -43,6 +43,10 @@ That said, just read and learn the [bottles.sh](https://github.com/ivan-hc/Bottl
 
 If you want an idea on how the logs are, go to https://github.com/ivan-hc/Bottles-appimage/actions and read the workflows run.
 
+## Inbuilt packages
+- from Debian 12: ca-certificates, cabextract, curl, gamescope, libadwaita-1-dev, libcurl4, libffi-dev, libgtk-4-dev, libgtksourceview-5-dev, patool, python3, python3-chardet, python3-gi, python3-icoextract, python3-pathvalidate, python3-pycurl, python3-requests, python3-yaml
+- from Arch Linux: "bottles" and "fvs" from (AUR), patool, python-steamgriddb, vkbasalt-cli, python-gobject, python-orjson, python-pycurl (for TLS support), /usr/share/glib-2.0/*, "setuptools" and "lib-dynload/_socket*" from /usr/lib/python*
+
 ---------------------------------
 # Credits
 
