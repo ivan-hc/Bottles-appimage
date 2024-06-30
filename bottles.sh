@@ -20,14 +20,16 @@ function _archimage(){
 	HOME="$(dirname "$(readlink -f $0)")" 
 	# DOWNLOAD AND INSTALL JUNEST (DON'T TOUCH THIS)
 	git clone https://github.com/fsquillace/junest.git ~/.local/share/junest
-	wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
+	wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/20240317/junest-x86_64.tar.gz # JuNest snapshot
+	#wget -q --show-progress https://github.com/ivan-hc/junest/releases/download/continuous/junest-x86_64.tar.gz
 	./.local/share/junest/bin/junest setup -i junest-x86_64.tar.gz
 	rm -f junest-x86_64.tar.gz
 	# ENABLE MULTILIB (optional)
 	echo -e "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
 	# CUSTOM MIRRORLIST
 	rm -R ./.junest/etc/pacman.d/mirrorlist
-	wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
+	echo 'Server = https://archive.archlinux.org/repos/2024/03/12/$repo/os/$arch' >> ./.junest/etc/pacman.d/mirrorlist # Arch Linux snapshot
+	#wget -q https://archlinux.org/mirrorlist/all/ -O - | awk NR==2 RS= | sed 's/#Server/Server/g' >> ./.junest/etc/pacman.d/mirrorlist # ENABLES WORLDWIDE MIRRORS
 	# BYPASS SIGNATURE CHECK LEVEL
 	sed -i 's/#SigLevel/SigLevel/g' ./.junest/etc/pacman.conf
 	sed -i 's/Required DatabaseOptional/Never/g' ./.junest/etc/pacman.conf
