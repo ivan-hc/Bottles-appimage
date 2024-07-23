@@ -54,16 +54,29 @@ Points 1, 2 and 3 are the essential elements of any AppImage.
 ## Why Conty?
 Conty is a portable Arch Linux container with its own resources.
 
-Its the only solution that installs its own copy of Nvidia drivers, if not available in the container itself.
+Its the only solution that installs its own copy of Nvidia drivers, if not available in the container itself (see picture below).
+
+![running conty](https://github.com/user-attachments/assets/5038abc2-36c3-4891-ab0a-6da012b7b240)
+
+The drivers are installed in the ~/.local/share/Conty directory and can take up to 700 MB of space.
+
+Considering that Bottles, at first start, downloading the necessary libraries and creating profiles for WINE, reaches about 1.4 GB of space in ~/.local/share/bottles, I would say that the size is more than acceptable.
+
+![disk usage](https://github.com/user-attachments/assets/73ccd625-9731-408e-ac7d-30f76fa81d55)
+
+It's a bit like installing a Flatpak runtime. But only one. The rest of the files are stored in Conty itself.
 
 ---------------------------------
 
 ## Why Conty into an AppImage?
-Wrapping Conty into an AppImage allows it to be isolated (via Aisap/bubblewrap sandbox) in the system and integrated using "[AM](https://github.com/ivan-hc/AM)", the package manager for all AppImages and portable apps for GNU/Linux, at **https://github.com/ivan-hc/AM**
-
-You can download the AppImage from https://github.com/ivan-hc/Bottles-appimage/releases/tag/continuous
+Wrapping Conty into an AppImage allows it to be isolated (via bubblewrap sandbox) using my package manager "[AM](https://github.com/ivan-hc/AM)".
 
 This AppImage is a new generation one (Type3 AppImage), so you don't need `libfuse2` installed on your system to use it.
+
+---------------------------------
+
+## Download
+You can download the AppImage from https://github.com/ivan-hc/Bottles-appimage/releases/tag/continuous
 
 ---------------------------------
 
