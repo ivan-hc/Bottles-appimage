@@ -29,11 +29,9 @@ I thank the developer of Bottles, @mirkobrombin, for helping me build the AppIma
 ## Construction method
 I have tried many times to allow non-Flatpak users to use Bottles in an alternative way, and not without difficulty.
 
-At this time, the only method that works with certainty is via [Conty](https://github.com/Kron4ek/Conty):
-- "Conty" project, at https://github.com/Kron4ek/Conty
-- my fork, at https://github.com/ivan-hc/Conty
+At this time, the only method that works with certainty is via [Conty](https://github.com/Kron4ek/Conty), at **https://github.com/Kron4ek/Conty**.
 
-My fork can be used to try to reduce its size.
+I've done a [fork](https://github.com/ivan-hc/Conty) of this project to include only Bottles, WINE and audio/video drivers in my release of Conty.
 
 Currently, the AppImage I produced contains the following structure:
 ```
@@ -48,6 +46,10 @@ Currently, the AppImage I produced contains the following structure:
 4. The Arch Linux container named "conty.sh", it contains Bottles, WINE and grafic drivers
 
 Points 1, 2 and 3 are the essential elements of any AppImage.
+
+The script "conty.sh" (4) is the big one among the elements of this AppImage (1,2 GB).
+
+For suggestion on how to reduce this, visit my fork at https://github.com/ivan-hc/Conty, any help is appreciate.
 
 ---------------------------------
 
@@ -86,13 +88,10 @@ Having few resources available is what pushed me to proceed by trial and error, 
 The use of Conty is only the latest in a long series.
 
 Old building scripts are available in the directories of this repository:
-- "[legacy](https://github.com/ivan-hc/Bottles-appimage/tree/main/legacy)" contains experimental scripts to build the AppImage on top of JuNest, but it lack of hardware accelleration (see https://github.com/ivan-hc/ArchImage/issues/20)
+- "[legacy](https://github.com/ivan-hc/Bottles-appimage/tree/main/legacy)" contains experimental scripts to build the AppImage on top of JuNest, but it lack of hardware accelleration see https://github.com/ivan-hc/ArchImage/issues/20
 - "[hybrid](https://github.com/ivan-hc/Bottles-appimage/tree/main/hybrid)" was the one that worked thanks to a mix between my two projects [AppImaGen](https://github.com/ivan-hc/AppImaGen) and [ArchImage](https://github.com/ivan-hc/ArchImage), a mix of Arch Linux and Debian packages. It worked only for newer distros and until newer changes into an assential Arch Linux package (python) that was not good to keep maintain this method. Its still possible to download the only available release son of this method, at https://github.com/ivan-hc/Bottles-appimage/releases/tag/51.11-2
 
----------------------------------
-
-## Known issues
-The AppImage is 1,2 GB of size due to the internal Conty script that can't be compressed, being itself a filesystem, like the AppImage that contains it. If you want to reduce size, go to https://github.com/ivan-hc/Conty and help me improve my fork. 
+Given the "troubled" history of this repository, I don't know if Conty is the ultimate solution for my workflow. It all depends on the packages that are made available to me by upstream developers or third parties.
 
 ---------------------------------
 
