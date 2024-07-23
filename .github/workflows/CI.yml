@@ -16,7 +16,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libfuse2
-        wget https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/bottles.sh
+        wget https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/bottles-conty-builder.sh
         chmod a+x ./bottles.sh
         ./bottles.sh
         mkdir dist
