@@ -54,7 +54,7 @@ chmod a+x ./AppRun
 
 # DOWNLOAD CONTY
 if ! test -f ./*.sh; then
-	conty_download_url=$(curl -Ls https://api.github.com/repos/ivan-hc/Conty/releases | sed 's/[()",{} ]/\n/g' | grep -oi "https.*sh$" | head -1)
+	conty_download_url=$(curl -Ls https://api.github.com/repos/ivan-hc/Conty/releases | sed 's/[()",{} ]/\n/g' | grep -oi "https.*bottles.*sh$" | head -1)
 	echo " Downloading Conty..."
 	if wget --version | head -1 | grep -q ' 1.'; then
 		wget -q --no-verbose --show-progress --progress=bar "$conty_download_url"
