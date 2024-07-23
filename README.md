@@ -73,6 +73,8 @@ It's a bit like installing a Flatpak runtime. But only one. The rest of the file
 ## Why Conty into an AppImage?
 Wrapping Conty into an AppImage allows it to be isolated (via bubblewrap sandbox) using my package manager "[AM](https://github.com/ivan-hc/AM)".
 
+![running conty-based AppImage](https://github.com/user-attachments/assets/d86c3b9a-b7a3-4b5a-8229-f95fa186c9be)
+
 This AppImage is a new generation one (Type3 AppImage), so you don't need `libfuse2` installed on your system to use it.
 
 ---------------------------------
