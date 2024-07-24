@@ -47,7 +47,7 @@ Currently, the AppImage I produced contains the following structure:
 
 Points 1, 2 and 3 are the essential elements of any AppImage.
 
-The script "conty.sh" (4) is the big one among the elements of this AppImage (1,2 GB).
+The script "conty.sh" (4) is the big one among the elements of this AppImage.
 
 For suggestion on how to reduce this, visit my fork at https://github.com/ivan-hc/Conty, any help is appreciate.
 
