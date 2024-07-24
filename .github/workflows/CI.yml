@@ -14,11 +14,12 @@ jobs:
 
     - name: build
       run: |
-        sudo apt update
-        sudo apt install libfuse2
-        wget https://raw.githubusercontent.com/ivan-hc/Bottles-appimage/main/bottles-conty-builder.sh
-        chmod a+x ./bottles-conty-builder.sh
-        ./bottles-conty-builder.sh
+        APP=bottles
+        chmod +x create-arch-bootstrap.sh create-conty.sh "$APP"-conty-builder.sh
+        sudo ./create-arch-bootstrap.sh && ./create-conty.sh
+        mkdir -p tmp/"$APP".AppDir
+        mv ./conty.sh tmp/"$APP".AppDir/ || exit 1
+        ./"$APP"-conty-builder.sh
         mkdir dist
         mv *AppImage dist/
     - name: Upload artifact
