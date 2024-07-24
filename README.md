@@ -1,5 +1,7 @@
 This repository creates and distributes the unofficial Appimage of [Bottles](https://usebottles.com/).
 
+![Istantanea_2024-02-28_14-48-48 png](https://github.com/Portable-Linux-Apps/Portable-Linux-Apps.github.io/assets/88724353/b710774a-b412-439d-a90c-db576db3ce12)
+
 ---------------------------------
 # INDEX
 
