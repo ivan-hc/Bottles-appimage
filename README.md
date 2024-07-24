@@ -1,7 +1,29 @@
 This repository creates and distributes the unofficial Appimage of [Bottles](https://usebottles.com/).
 
 ---------------------------------
+# INDEX
 
+[Disclaim](#disclaim)
+
+[Motivation](#motivation)
+
+[Construction method](#construction-method)
+
+[Why Conty?](#why-conty)
+
+[Why Conty into an AppImage?](#why-conty-into-an-appimage)
+
+[Download](#download)
+
+[Previous alternative methods](#previous-alternative-methods)
+
+[Troubleshot](#troubleshot)
+
+[Credits](#credits)
+
+[Install and update it with ease](#install-and-update-it-with-ease)
+
+---------------------------------
 ## Disclaim
 The official Bottles package is only available as a Flatpak.
 
@@ -97,20 +119,28 @@ Given the "troubled" history of this repository, I don't know if Conty is the ul
 
 ---------------------------------
 
+## Troubleshot
+
+### ◆ Very slow first startup
+At the first start, if necessary, the drivers for your video card will be downloaded, via Conty (see screenshot above). This may take several seconds or even minutes. This behaviour will only be noticed if when you first start it, you launch Bottles from the terminal instead of using the launcher.
+
+---------------------------------
+
 ## Credits
 
 - @mirkobrombin for all the patience and availability shown to me
 - Conty https://github.com/Kron4ek/Conty
 
 ---------------------------------
+
 ## Install and update it with ease
 
-I wrote two bash scripts to install and manage the applications: [AM](https://github.com/ivan-hc/AM-Application-Manager) and [AppMan](https://github.com/ivan-hc/AppMan). Their dual existence is based on the needs of the end user.
+I wrote two bash scripts to install and manage the applications: [AM](https://github.com/ivan-hc/AM) and [AppMan](https://github.com/ivan-hc/AppMan). Their dual existence is based on the needs of the end user.
 
-| [**"AM" Application Manager**](https://github.com/ivan-hc/AM-Application-Manager) |
+| [**"AM" Application Manager**](https://github.com/ivan-hc/AM) |
 | -- |
-| <sub>***If you want to install system-wide applications on your GNU/Linux distribution in a way that is compatible with [Linux Standard Base](https://refspecs.linuxfoundation.org/lsb.shtml) (all third-party apps must be installed in dedicated directories under `/opt` and their launchers and binaries in `/usr/local/*` ...), just use ["AM" Application Manager](https://github.com/ivan-hc/AM-Application-Manager). This app manager requires root privileges only to install / remove applications, the main advantage of this type of installation is that the same applications will be available to all users of the system.***</sub>
-[![Readme](https://img.shields.io/github/stars/ivan-hc/AM-Application-Manager?label=%E2%AD%90&style=for-the-badge)](https://github.com/ivan-hc/AM-Application-Manager/stargazers) [![Readme](https://img.shields.io/github/license/ivan-hc/AM-Application-Manager?label=&style=for-the-badge)](https://github.com/ivan-hc/AM-Application-Manager/blob/main/LICENSE)
+| <sub>***If you want to install system-wide applications on your GNU/Linux distribution in a way that is compatible with [Linux Standard Base](https://refspecs.linuxfoundation.org/lsb.shtml) (all third-party apps must be installed in dedicated directories under `/opt` and their launchers and binaries in `/usr/local/*` ...), just use ["AM" Application Manager](https://github.com/ivan-hc/AM). This app manager requires root privileges only to install / remove applications, the main advantage of this type of installation is that the same applications will be available to all users of the system.***</sub>
+[![Readme](https://img.shields.io/github/stars/ivan-hc/AM?label=%E2%AD%90&style=for-the-badge)](https://github.com/ivan-hc/AM/stargazers) [![Readme](https://img.shields.io/github/license/ivan-hc/AM?label=&style=for-the-badge)](https://github.com/ivan-hc/AM/blob/main/LICENSE)
 
 | [**"AppMan"**](https://github.com/ivan-hc/AppMan)
 | --
