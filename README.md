@@ -11,6 +11,8 @@ This repository creates and distributes the unofficial Appimage of [Bottles](htt
 
 [Construction method](#construction-method)
 
+[Build Bottles using Conty](#build-bottles-using-conty)
+
 [Why Conty?](#why-conty)
 
 [Why Conty into an AppImage?](#why-conty-into-an-appimage)
@@ -53,9 +55,7 @@ I thank the developer of Bottles, @mirkobrombin, for helping me build the AppIma
 ## Construction method
 I have tried many times to allow non-Flatpak users to use Bottles in an alternative way, and not without difficulty.
 
-At this time, the only method that works with certainty is via [Conty](https://github.com/Kron4ek/Conty), at **https://github.com/Kron4ek/Conty**.
-
-I've done a [fork](https://github.com/ivan-hc/Conty) of this project to include only Bottles, WINE and audio/video drivers in my release of Conty.
+At this time, the only method that works with certainty is via [Conty](https://github.com/Kron4ek/Conty).
 
 Currently, the AppImage I produced contains the following structure:
 ```
@@ -73,7 +73,24 @@ Points 1, 2 and 3 are the essential elements of any AppImage.
 
 The script "conty.sh" (4) is the big one among the elements of this AppImage.
 
-For suggestion on how to reduce this, visit my fork at https://github.com/ivan-hc/Conty, any help is appreciate.
+---------------------------------
+
+## Build Bottles using Conty
+This is what each file of my workflow is ment for:
+1. [create-arch-bootstrap.sh](https://github.com/ivan-hc/Bottles-appimage/blob/main/create-arch-bootstrap.sh) creates an Arch Linux chroot, where Bottles is installed from AUR. This is the first script to be used ("root" required);
+2. [create-conty.sh](https://github.com/ivan-hc/Bottles-appimage/blob/main/create-conty.sh) is the second script used in this process, it converts the Arch Linux chroot created by "create-arch-bootstrap.sh" into a big script named "conty.sh", that includes "conty-start.sh";
+3. [conty-start.sh](https://github.com/ivan-hc/Bottles-appimage/blob/main/conty-start.sh) is the script responsible of startup inizialization processes to made Conty work. It includes a function that detects the version of the Nvidia drivers needed, if they are needed, the script downloads and installs them in ~/.local/share/Conty. Also it is responsible of full integration of Conty with the host system, using "bubblewrap;
+4. [utils_dwarfs.tar.gz](https://github.com/ivan-hc/Bottles-appimage/blob/main/utils_dwarfs.tar.gz) contains "dwarfs", a set of tools similar to squashfs to compress filesystems, and it is needed to compress "conty.sh" as much as possible;
+5. [bottles-conty-builder.sh](https://github.com/ivan-hc/Bottles-appimage/blob/main/bottles-conty-builder.sh) is a script i wrote to pundle "conty.sh" near the AppRun, the .desktop file and the icon to convert everything into an AppImage. It is ment to be used in github actions, but can be executed locally to build create the AppImage using a testing release of "conty.sh" from [my fork](https://github.com/ivan-hc/Conty) of Conty.
+
+Files 1, 2, 3 and 4 come from my fork of https://github.com/Kron4ek/Conty
+
+Files 1, 2 and 3 are a mod of the original ones to made them smaller and with only what its needed to made Bottles work.
+
+To learn more about "Conty", to download more complete builds or to learn more on how to create your own, visit the official repository of the project:
+
+https://github.com/Kron4ek/Conty
+--------------
 
 ---------------------------------
 
