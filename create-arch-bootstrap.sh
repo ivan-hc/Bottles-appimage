@@ -383,7 +383,7 @@ run_in_chroot sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' /etc/profile.d/locale.sh
 run_in_chroot rm -Rf /usr/include /usr/man
 
 # Check if the command we are interested in has been installed
-run_in_chroot "$(if ! command -v bottles; then echo "Command not found, exiting." && exit 1; fi)"
+if ! run_in_chroot which bottles; then echo "Command not found, exiting." && exit 1; fi
 
 unmount_chroot
 
