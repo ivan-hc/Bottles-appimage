@@ -36,7 +36,7 @@ devel_pkgs="base-devel git meson mingw-w64-gcc cmake"
 # packages from the Chaotic-AUR repo
 export packagelist="${audio_pkgs} ${video_pkgs} ${wine_pkgs} ${devel_pkgs} \
 	ttf-dejavu ttf-liberation xorg-xwayland gamemode lib32-gamemode wayland \
-	lib32-wayland xorg-server xorg-apps"
+	lib32-wayland xorg-server xorg-apps which"
 
 # If you want to install AUR packages, specify them in this variable
 export aur_packagelist="bottles"
@@ -362,7 +362,7 @@ if [ -n "${aur_packagelist}" ]; then
 	export -f install_aur_packages
 	CHROOT_AUR=1 HOME=/home/aur run_in_chroot bash -c install_aur_packages
 	mv "${bootstrap}"/home/aur/bad_aur_pkglist.txt "${bootstrap}"/opt
-	rm -rf "${bootstrap}"/home/aur
+	#rm -rf "${bootstrap}"/home/aur
 fi
 
 #run_in_chroot locale-gen
@@ -381,10 +381,14 @@ run_in_chroot sed -i 's/LANG=${LANG:-C}/LANG=$LANG/g' /etc/profile.d/locale.sh
 
 # Remove bloatwares
 run_in_chroot rm -Rf /usr/include /usr/man
+run_in_chroot bash -c 'find "${bootstrap}"/usr/share/doc/* -not -iname "*bottles*" -a -not -name "." -delete'
+run_in_chroot bash -c 'find "${bootstrap}"/usr/share/locale/*/*/* -not -iname "*bottles*" -a -not -name "." -delete'
 
 # Check if the command we are interested in has been installed
 if ! run_in_chroot which bottles; then echo "Command not found, exiting." && exit 1; fi
 
+# Exit chroot
+rm -rf "${bootstrap}"/home/aur
 unmount_chroot
 
 # Clear pacman package cache
