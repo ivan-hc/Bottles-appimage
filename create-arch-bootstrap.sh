@@ -384,7 +384,7 @@ cp "${bootstrap}"/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so "${bootstrap}"/usr/
 cp "${bootstrap}"/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-* "${bootstrap}"/usr/lib/
 
 # Remove bloatwares
-run_in_chroot rm -Rf /usr/include /usr/man
+run_in_chroot rm -Rf /usr/include /usr/share/man
 run_in_chroot bash -c 'find "${bootstrap}"/usr/share/doc/* -not -iname "*bottles*" -a -not -name "." -delete'
 run_in_chroot bash -c 'find "${bootstrap}"/usr/share/locale/*/*/* -not -iname "*bottles*" -a -not -name "." -delete'
 
