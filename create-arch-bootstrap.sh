@@ -7,7 +7,8 @@
 
 # Package groups
 audio_pkgs="alsa-lib lib32-alsa-lib alsa-plugins lib32-alsa-plugins libpulse \
-	lib32-libpulse jack2 lib32-jack2 alsa-tools alsa-utils pipewire lib32-pipewire"
+	lib32-libpulse jack2 lib32-jack2 alsa-tools alsa-utils pipewire \
+	lib32-pipewire"
 
 video_pkgs="mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon \
 	vulkan-intel lib32-vulkan-intel \
@@ -28,15 +29,25 @@ wine_pkgs="wine-staging winetricks-git wine-nine wineasio \
 	gst-plugins-ugly gst-plugins-base lib32-gst-plugins-good \
 	lib32-gst-plugins-base gst-libav wget gst-plugin-pipewire"
 
+wine32_pkgs="lib32-giflib lib32-libpng lib32-libldap lib32-gnutls mpg123 \
+	lib32-mpg123 lib32-openal lib32-v4l-utils lib32-libpulse \
+	lib32-alsa-plugins lib32-alsa-lib \
+	lib32-libjpeg-turbo lib32-libxcomposite \
+	lib32-libxinerama lib32-libxslt lib32-libva gtk3 \
+	lib32-gtk3 lib32-sdl2 lib32-vkd3d lib32-gst-plugins-good \
+	lib32-gst-plugins-base"
+
 devel_pkgs="base-devel git meson mingw-w64-gcc cmake"
 
 # Packages to install
 # You can add packages that you want and remove packages that you don't need
 # Apart from packages from the official Arch repos, you can also specify
 # packages from the Chaotic-AUR repo
-export packagelist="${audio_pkgs} ${video_pkgs} ${wine_pkgs} ${devel_pkgs} \
+export packagelist="${audio_pkgs} ${wine32_pkgs} ${devel_pkgs} \
 	ttf-dejavu ttf-liberation xorg-xwayland gamemode lib32-gamemode wayland \
-	lib32-wayland xorg-server xorg-apps which ibus"
+	lib32-wayland xorg-server xorg-apps which ibus libpng v4l-utils libxslt \
+ 	vulkan-icd-loader lib32-vulkan-icd-loader gnutls openal libjpeg-turbo \
+	libva sdl2"
 
 # If you want to install AUR packages, specify them in this variable
 export aur_packagelist="bottles"
@@ -370,6 +381,7 @@ fi
 # Remove unneeded packages
 run_in_chroot pacman --noconfirm -Rsu base-devel meson mingw-w64-gcc cmake gcc
 run_in_chroot pacman --noconfirm -Rdd wine-staging
+run_in_chroot pacman -Qdtq | run_in_chroot pacman --noconfirm -Rsn -
 run_in_chroot pacman --noconfirm -Scc
 
 # Generate a list of installed packages
@@ -384,7 +396,8 @@ cp "${bootstrap}"/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so "${bootstrap}"/usr/
 cp "${bootstrap}"/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-* "${bootstrap}"/usr/lib/
 
 # Remove bloatwares
-run_in_chroot rm -Rf /usr/include /usr/share/man
+run_in_chroot pacman --noconfirm -Rsndd gcc
+run_in_chroot rm -Rf /usr/include /usr/share/man /usr/share/gtk-doc /usr/lib/gcc /usr/bin/gcc*
 run_in_chroot bash -c 'find "${bootstrap}"/usr/share/doc/* -not -iname "*bottles*" -a -not -name "." -delete'
 run_in_chroot bash -c 'find "${bootstrap}"/usr/share/locale/*/*/* -not -iname "*bottles*" -a -not -name "." -delete'
 
