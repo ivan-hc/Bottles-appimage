@@ -47,7 +47,7 @@ export packagelist="${audio_pkgs} ${wine32_pkgs} ${devel_pkgs} \
 	ttf-dejavu ttf-liberation xorg-xwayland gamemode lib32-gamemode wayland \
 	lib32-wayland xorg-server xorg-apps which ibus libpng v4l-utils libxslt \
  	vulkan-icd-loader lib32-vulkan-icd-loader gnutls openal libjpeg-turbo \
-	libva sdl2"
+	libva sdl2 xterm"
 
 # If you want to install AUR packages, specify them in this variable
 export aur_packagelist="bottles"
