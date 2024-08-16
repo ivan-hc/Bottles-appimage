@@ -15,6 +15,7 @@ jobs:
     - name: build
       run: |
         APP=bottles
+        sudo apt update && sudo apt install libfuse2 desktop-file-utils
         wget -q https://raw.githubusercontent.com/ivan-hc/Conty/master/create-conty.sh
         wget -q https://raw.githubusercontent.com/ivan-hc/Conty/master/conty-start.sh
         chmod +x create-arch-bootstrap.sh create-conty.sh "$APP"-conty-builder.sh
