@@ -70,5 +70,5 @@ cd .. || exit 1
 # EXPORT THE APPDIR TO AN APPIMAGE
 VERSION=$(curl -Ls https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=bottles | grep "^pkgver=" | cut -c 8-)
 ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 1 ./"$APP".AppDir
-cd .. && mv ./tmp/*.AppImage ./ || exit 1
+cd .. && mv ./tmp/*.AppImage ./Bottles-"$VERSION"-x86_64.AppImage || exit 1
 
