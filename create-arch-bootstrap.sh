@@ -396,7 +396,9 @@ cp "${bootstrap}"/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so "${bootstrap}"/usr/
 cp "${bootstrap}"/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-* "${bootstrap}"/usr/lib/
 
 # Remove bloatwares
-run_in_chroot pacman --noconfirm -Rsndd gcc
+run_in_chroot pacman --noconfirm -Rsndd gcc yay pacman systemd
+run_in_chroot pacman -Qdtq | run_in_chroot pacman --noconfirm -Rsn -
+run_in_chroot pacman --noconfirm -Rsndd pacman
 run_in_chroot rm -Rf /usr/include /usr/share/man /usr/share/gtk-doc /usr/lib/gcc /usr/bin/gcc*
 run_in_chroot bash -c 'find "${bootstrap}"/usr/share/doc/* -not -iname "*bottles*" -a -not -name "." -delete'
 run_in_chroot bash -c 'find "${bootstrap}"/usr/share/locale/*/*/* -not -iname "*bottles*" -a -not -name "." -delete'
@@ -410,7 +412,13 @@ rm -rf "${bootstrap}"/usr/lib32/*.a
 rm -rf "${bootstrap}"/usr/lib32/libgo.so*
 rm -rf "${bootstrap}"/usr/lib32/libgphobos.so*
 rm -rf "${bootstrap}"/usr/share/ibus/dicts/emoji*
-rm -rf "${bootstrap}"/usr/share/perl*
+rm -rf "${bootstrap}"/usr/lib/systemd
+rm -rf "${bootstrap}"/usr/share/info
+rm -rf "${bootstrap}"/usr/share/gir-1.0
+rm -rf "${bootstrap}"/var/lib/pacman/*
+strip --strip-debug "${bootstrap}"/usr/lib/*
+strip --strip-debug "${bootstrap}"/usr/lib32/*
+strip --strip-unneeded "${bootstrap}"/usr/bin/*
 
 # Check if the command we are interested in has been installed
 if ! run_in_chroot which bottles; then echo "Command not found, exiting." && exit 1; fi
