@@ -143,6 +143,9 @@ Given the "troubled" history of this repository, I don't know if Conty is the ul
 ### ◆ Very slow first startup for Nvidia users
 At the first start, if necessary, the drivers for your video card will be downloaded, via Conty (see screenshot above). This may take several seconds or even minutes. This behaviour will only be noticed if when you first start it, you launch Bottles from the terminal instead of using the launcher.
 
+### ◆ Add programs to the desktop / `bottles-cli` usage
+Create a symlink "`bottles-cli`" for this Appimage and add it to a $PATH, so when you add a program to the desktop you will be able to launch it from the menu with the related icon. This feature is already available if you install "bottles" using "AM" and "AppMan".
+
 ---------------------------------
 
 ## Credits
