@@ -416,9 +416,9 @@ rm -rf "${bootstrap}"/usr/lib/systemd
 rm -rf "${bootstrap}"/usr/share/info
 rm -rf "${bootstrap}"/usr/share/gir-1.0
 rm -rf "${bootstrap}"/var/lib/pacman/*
-strip --strip-debug "${bootstrap}"/usr/lib/*
-strip --strip-debug "${bootstrap}"/usr/lib32/*
-strip --strip-unneeded "${bootstrap}"/usr/bin/*
+find "${bootstrap}"/usr/lib "${bootstrap}"/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \;
+find "${bootstrap}"/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
+find "${bootstrap}"/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \;
 
 # Check if the command we are interested in has been installed
 if ! run_in_chroot which bottles; then echo "Command not found, exiting." && exit 1; fi
