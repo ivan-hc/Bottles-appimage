@@ -46,8 +46,8 @@ cat >> ./AppRun << 'EOF'
 HERE="$(dirname "$(readlink -f "${0}")")"
 export UNION_PRELOAD="${HERE}"
 case "$1" in
-	'') "${HERE}"/conty.sh bottles;;
-	*) "${HERE}"/conty.sh bottles-cli "$@";;
+	'') "${HERE}"/conty.sh -- bottles;;
+	*) "${HERE}"/conty.sh -- bottles-cli "$@";;
 esac
 EOF
 chmod a+x ./AppRun
