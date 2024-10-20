@@ -23,7 +23,7 @@ devel_pkgs="base-devel git meson mingw-w64-gcc cmake"
 # Apart from packages from the official Arch repos, you can also specify
 # packages from the Chaotic-AUR repo
 export packagelist="${audio_pkgs} ${wine_pkgs} ${devel_pkgs} \
-	ttf-dejavu ttf-liberation xorg-xwayland gamemode lib32-gamemode wayland \
+	xorg-xwayland gamemode lib32-gamemode wayland \
 	lib32-wayland xorg-server xorg-apps which ibus libpng v4l-utils libxslt \
  	lib32-vulkan-icd-loader gnutls openal libjpeg-turbo libva sdl2 xterm"
 
@@ -359,6 +359,7 @@ rm -rf "${bootstrap}"/usr/share/info
 rm -rf "${bootstrap}"/usr/share/autoconf
 rm -rf "${bootstrap}"/usr/share/automake
 rm -rf "${bootstrap}"/usr/share/git*
+rm -rf "${bootstrap}"/usr/share/fonts/*
 rm -rf "${bootstrap}"/usr/share/pacman
 rm -rf "${bootstrap}"/usr/share/gir-1.0
 rm -rf "${bootstrap}"/var/lib/pacman/*
@@ -392,6 +393,7 @@ rm -f "${bootstrap}"/var/cache/pacman/pkg/*
 # This is needed for bubblewrap to be able to bind real files/dirs to them
 # later in the conty-start.sh script
 mkdir "${bootstrap}"/media
+mkdir -p "${bootstrap}"/usr/share/fonts
 mkdir -p "${bootstrap}"/usr/share/steam/compatibilitytools.d
 touch "${bootstrap}"/etc/asound.conf
 touch "${bootstrap}"/etc/localtime
