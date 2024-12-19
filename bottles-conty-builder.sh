@@ -69,7 +69,9 @@ cd .. || exit 1
 
 # EXPORT THE APPDIR TO AN APPIMAGE
 VERSION=$(curl -Ls https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=bottles | grep "^pkgver=" | cut -c 8-)
-ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 1 \
+printf '#!/bin/sh\nexit 0' > ./desktop-file-validate
+chmod a+x ./appimagetool ./desktop-file-validate
+PATH="$PATH:$PWD" ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 1 \
 	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|Bottles-appimage|continuous|*x86_64.AppImage.zsync" \
 	./"$APP".AppDir ./Bottles-"$VERSION"-x86_64.AppImage
 cd .. && mv ./tmp/*.AppImage* ./ || exit 1
