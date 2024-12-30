@@ -3,13 +3,31 @@
 # NAME OF THE APP BY REPLACING "SAMPLE"
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-DEPENDENCES="blueprint-compiler ca-certificates fvs cabextract faudio gamemode imagemagick lib32-mpg123 lib32-fontconfig fontconfig libeproxy libselinux libx11 p7zip pipewire procps-ng pulseaudio patool python python-gobject python-yaml tar wine winetricks xorg-xdpyinfo zimg"
+DEPENDENCES="7zip \
+alsa-lib alsa-plugins \
+cabextract ca-certificates \
+dbus \
+faudio flac freetype2 fvs \
+gamemode gamemode gnutls gtk3 \
+ibus imagemagick \
+lame \
+lib32-alsa-lib lib32-alsa-lib lib32-alsa-plugins lib32-freetype2 lib32-gamemode lib32-gcc-libs lib32-giflib lib32-glibc lib32-gnutls lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libpulse lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-pipewire lib32-sdl2 lib32-v4l-utils lib32-vkd3d lib32-vkd3d lib32-vulkan-icd-loader lib32-vulkan-mesa-layers lib32-wayland \
+libasyncns libgirepository libibus libjpeg-turbo libogg libpng libpulse libpulse librsvg libsndfile libva libvorbis libxslt \
+mpg123 mpg123 \
+openal opus patool \
+pipewire pipewire procps-ng pulseaudio pulseaudio pulseaudio-alsa \
+python python-gobject python-yaml \
+sdl2 \
+tar \
+v4l-utils vulkan-mesa-layers \
+wayland \
+xorg-apps xorg-server xorg-xwayland xterm"
 BASICSTUFF="binutils debugedit gzip"
 COMPILERS="base-devel"
 
 # CREATE AND ENTER THE APPDIR
 if ! test -f ./appimagetool; then
-	wget -q "$(wget -q https://api.github.com/repos/probonopd/go-appimage/releases -O - | sed 's/"/ /g; s/ /\n/g' | grep -o 'https.*continuous.*tool.*86_64.*mage$')" -O appimagetool
+	wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
 	chmod a+x appimagetool
 fi
 mkdir -p "$APP".AppDir && cd "$APP".AppDir || exit 1
@@ -20,12 +38,6 @@ HOME="$(dirname "$(readlink -f $0)")"
 # DOWNLOAD AND INSTALL JUNEST
 function _enable_multilib() {
 	printf "\n[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> ./.junest/etc/pacman.conf
-}
-
-function _install_libselinux_if_dependence() {
-	if [[ "$DEPENDENCES" = *"libselinux"* ]]; then
-		printf "\n[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> ./.junest/etc/pacman.conf
-	fi
 }
 
 function _enable_chaoticaur() {
@@ -53,8 +65,7 @@ function _bypass_signature_check_level() {
 
 function _pacman_patches() {
 	_enable_multilib
-	_install_libselinux_if_dependence
-	###_enable_chaoticaur
+	_enable_chaoticaur
 	_custom_mirrorlist
 	_bypass_signature_check_level
 }
@@ -104,7 +115,7 @@ fi
 function _backup_junest() {
 	cd ..
 	echo ""
-	echo "n-----------------------------------------------------------"
+	echo "-----------------------------------------------------------"
 	echo " BACKUP OF JUNEST FOR FURTHER APPIMAGE BUILDING ATTEMPTS"
 	echo "-----------------------------------------------------------"
 	mkdir -p ./junest-backups
@@ -132,7 +143,9 @@ if [ ! -z "$DEPENDENCES" ]; then
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$DEPENDENCES"
 fi
 if [ ! -z "$APP" ]; then
+	./.local/share/junest/bin/junest -- yay --noconfirm -S alsa-lib
 	./.local/share/junest/bin/junest -- yay --noconfirm -S "$APP"
+	./.local/share/junest/bin/junest -- glib-compile-schemas /usr/share/glib-2.0/schemas/
 else
 	echo "No app found, exiting"; exit 1
 fi
@@ -205,48 +218,56 @@ function _create_AppRun() {
 	HERE="$(dirname "$(readlink -f $0)")"
 	export UNION_PRELOAD=$HERE
 	export JUNEST_HOME=$HERE/.junest
-
-	# DOWNLOAD THE RUNTIME OF BOTTLES
-	if ! [ -d $HOME/.local/share/bottles/runtimes ]; then
-		mkdir -p $HOME/.local/share/bottles/runtimes
-		bottlesruntimedlurl=$(wget -q https://api.github.com/repos/bottlesdevs/runtime/releases -O - | grep browser_download_url | grep -i "runtime-" | cut -d '"' -f 4)
-		wget -q $bottlesruntimedlurl -O Bottles-runtime.tar.gz
-		tar xf ./Bottles-runtime.tar.gz -C $HOME/.local/share/bottles/runtimes/ 2> /dev/null
-		rm -R -f ./Bottles-runtime.tar.gz
-	fi
-
-	# FIND THE VENDOR
-	VENDOR=$(glxinfo -B | grep "OpenGL vendor")
-	if ! echo "$VENDOR" | grep -q "*Intel*"; then
-		export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/intel_icd.i686.json:/usr/share/vulkan/icd.d/intel_icd.x86_64.json"
-		VENDORLIB="intel"
-		export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
-	elif ! echo "$VENDOR" | grep -q "*NVIDIA*"; then
-		export VK_ICD_FILENAMES=$(find /usr/share -name "*nvidia*json" | tr "\n" ":" | rev | cut -c 2- | rev)
-		VENDORLIB="nvidia"
-		export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
-	elif ! echo "$VENDOR" | grep -q "*Radeon*"; then
-		export VK_ICD_FILENAMES="/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
-		VENDORLIB="radeon"
-		export MESA_LOADER_DRIVER_OVERRIDE=$VENDORLIB
-	fi
-
 	export PATH=$PATH:$HERE/.local/share/junest/bin
 
-	if test -f /etc/resolv.conf; then ETC_RESOLV=' --bind /etc/resolv.conf /etc/resolv.conf '; fi
-	if test -d /media; then MNT_MEDIA_DIR=' --bind /media /media '; fi
-	if test -d /mnt; then MNT_DIR=' --bind /mnt /mnt '; fi
-	if test -d /opt; then OPT_DIR=' --bind /opt /opt '; fi
-	if test -d /run/user; then USR_LIB_LOCALE_DIR=' --bind /usr/lib/locale /usr/lib/locale '; fi
-	if test -d /usr/share/fonts; then USR_SHARE_FONTS_DIR=' --bind /usr/share/fonts /usr/share/fonts '; fi
-	if test -d /usr/share/themes; then USR_SHARE_THEMES_DIR=' --bind /usr/share/themes /usr/share/themes '; fi
-	if test -d /usr/lib/xorg; then USR_LIB_XORG=' --bind /usr/lib/xorg /usr/lib/xorg '; fi
-	if test -d /usr/share/xorg; then USR_SHARE_XORG=' --bind /usr/share/xorg /usr/share/xorg '; fi
-	if test -d /usr/share/X11; then USR_SHARE_X11=' --bind /usr/share/X11 /usr/share/X11 '; fi
+	[ -z "$NVIDIA_ON" ] && NVIDIA_ON=1
+	if [ "$NVIDIA_ON" = 1 ]; then
+	  DATADIR="${XDG_DATA_HOME:-$HOME/.local/share}"
+	  CONTY_DIR="${DATADIR}/Conty/overlayfs_shared"
+	  CACHEDIR="${XDG_CACHE_HOME:-$HOME/.cache}"
+	  [ -f /sys/module/nvidia/version ] && nvidia_driver_version="$(cat /sys/module/nvidia/version)"
+	  [ -f "${CONTY_DIR}"/nvidia/current-nvidia-version ] && nvidia_driver_conty="$(cat "${CONTY_DIR}"/nvidia/current-nvidia-version)"
+	  if [ "${nvidia_driver_version}" != "${nvidia_driver_conty}" ]; then
+	     if command -v curl >/dev/null 2>&1; then
+	        if ! curl --output /dev/null --silent --head --fail https://github.com 1>/dev/null; then
+	          notify-send "You are offline, cannot use Nvidia drivers"
+	        else
+	          notify-send "Configuring Nvidia drivers for this AppImage..."
+	          mkdir -p "${CACHEDIR}" && cd "${CACHEDIR}" || exit 1
+	          curl -Ls "https://raw.githubusercontent.com/ivan-hc/ArchImage/main/nvidia-junest.sh" > nvidia-junest.sh
+	          chmod a+x ./nvidia-junest.sh && ./nvidia-junest.sh
+	        fi
+	     else
+	        notify-send "Missing \"curl\" command, cannot use Nvidia drivers"
+	        echo "You need \"curl\" to download this script"
+	     fi
+	  fi
+	  [ -d "${CONTY_DIR}"/up/usr/bin ] && export PATH="${PATH}":"${CONTY_DIR}"/up/usr/bin:"${PATH}"
+	  [ -d "${CONTY_DIR}"/up/usr/lib ] && export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}":"${CONTY_DIR}"/up/usr/lib:"${LD_LIBRARY_PATH}"
+	  [ -d "${CONTY_DIR}"/up/usr/share ] && export XDG_DATA_DIRS="${XDG_DATA_DIRS}":"${CONTY_DIR}"/up/usr/share:"${XDG_DATA_DIRS}"
+	fi
 
-	BINDS=" $ETC_RESOLV $MNT_MEDIA_DIR $MNT_DIR $OPT_DIR $USR_LIB_LOCALE_DIR $USR_SHARE_FONTS_DIR $USR_SHARE_THEMES_DIR $USR_LIB_XORG $USR_SHARE_XORG $USR_SHARE_X11 "
-
-	if test -f $JUNEST_HOME/usr/lib/libselinux.so; then export LD_LIBRARY_PATH=/lib/:/lib64/:/lib/x86_64-linux-gnu/:/usr/lib/:"${LD_LIBRARY_PATH}"; fi
+	BINDS=" --dev-bind /dev /dev \
+		--ro-bind /sys /sys \
+		--bind-try /tmp /tmp \
+		--proc /proc \
+		--ro-bind-try /etc/resolv.conf /etc/resolv.conf \
+		--ro-bind-try /etc/hosts /etc/hosts \
+		--ro-bind-try /etc/nsswitch.conf /etc/nsswitch.conf \
+		--ro-bind-try /etc/passwd /etc/passwd \
+		--ro-bind-try /etc/group /etc/group \
+		--ro-bind-try /etc/machine-id /etc/machine-id \
+		--ro-bind-try /etc/asound.conf /etc/asound.conf \
+		--ro-bind-try /etc/localtime /etc/localtime \
+		--bind-try /media /media \
+		--bind-try /mnt /mnt \
+		--bind-try /opt /opt \
+ 		--bind-try /run/media /run/media \
+		--bind-try /usr/lib/locale /usr/lib/locale \
+		--bind-try /usr/share/fonts /usr/share/fonts \
+		--bind-try /usr/share/themes /usr/share/themes \
+		--bind-try /var /var \
+		"
 
 	EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 	$HERE/.local/share/junest/bin/junest -n -b "$BINDS" -- $EXEC "$@"
@@ -259,7 +280,7 @@ function _made_JuNest_a_potable_app() {
 	sed -i 's#${JUNEST_HOME}/usr/bin/junest_wrapper#${HOME}/.cache/junest_wrapper.old#g' ./.local/share/junest/lib/core/wrappers.sh
 	sed -i 's/rm -f "${JUNEST_HOME}${bin_path}_wrappers/#rm -f "${JUNEST_HOME}${bin_path}_wrappers/g' ./.local/share/junest/lib/core/wrappers.sh
 	sed -i 's/ln/#ln/g' ./.local/share/junest/lib/core/wrappers.sh
-	sed -i 's#--bind "$HOME" "$HOME"#--bind /home /home --bind-try /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
+	sed -i 's#--bind "$HOME" "$HOME"#--bind-try /home /home --bind-try /run/user /run/user#g' .local/share/junest/lib/core/namespace.sh
 	sed -i 's/rm -f "$file"/test -f "$file"/g' ./.local/share/junest/lib/core/wrappers.sh
 }
 
@@ -278,7 +299,6 @@ _set_locale
 _add_launcher_and_icon
 _create_AppRun
 _made_JuNest_a_potable_app
-_remove_some_bloatwares
 
 cd .. || exit 1 # EXIT THE APPDIR
 
@@ -369,8 +389,9 @@ echo ""
 
 # SAVE FILES USING KEYWORDS
 BINSAVED="certificates cut grep patool py rm wine xz png svg" # Enter here keywords to find and save in /usr/bin
-SHARESAVED="certificates adwaita appstream gnome gtk icons themes vk xml" # Enter here keywords or file/folder names to save in both /usr/share and /usr/lib
-LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d decor GL gl gnome gtk libgraphene lzo module pau repository selinux stemmer wine xml png svg" # Enter here keywords or file/folder names to save in /usr/lib
+SHARESAVED="certificates adwaita appstream gnome gtk icons themes vk xml" # Enter here keywords or file/directory names to save in both /usr/share and /usr/lib
+lib_browser_launcher="gio-launch-desktop libdl.so libpthread.so librt.so libasound.so libX11-xcb.so" # Libraries and files needed to launche the default browser
+LIBSAVED="pk p11 alsa jack pipewire python pulse adwaita appstream cairo d3d decor gdk-pixbuf GL gl gnome gtk libdav libgraphene librsvg lzo module pau repository selinux stemmer xml png svg $lib_browser_launcher" # Enter here keywords or file/directory names to save in /usr/lib
 
 # Save files in /usr/bin
 function _savebins() {
@@ -456,11 +477,6 @@ function _readelf_deps() {
 function _liblibs() {
  	_readelf_base
   	_readelf_deps
-  	readelf -d ./"$APP".AppDir/.junest/usr/lib32/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
-	readelf -d ./"$APP".AppDir/.junest/usr/lib32/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
-	readelf -d ./"$APP".AppDir/.junest/usr/lib32/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
-	readelf -d ./"$APP".AppDir/.junest/usr/lib32/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
-	readelf -d ./"$APP".AppDir/.junest/usr/lib32/*/*/*/*/* | grep .so | sed 's:.* ::' | cut -c 2- | sed 's/\(^.*so\).*$/\1/' | uniq >> ./list
 	ARGS=$(tail -n +2 ./list | sort -u | uniq)
 	for arg in $ARGS; do
 		mv ./"$APP".AppDir/.junest/usr/lib/"$arg"* ./save/
@@ -529,31 +545,53 @@ function _rsync_dependences() {
 }
 
 function _remove_more_bloatwares() {
-	rm -R -f ./"$APP".AppDir/.junest/home # remove the inbuilt home
+	_remove_some_bloatwares
+ 	rm -R -f ./"$APP".AppDir/.junest/home # remove the inbuilt home
+ 	rm -R -f ./"$APP".AppDir/.junest/usr/share/autoconf
+	rm -R -f ./"$APP".AppDir/.junest/usr/share/automake
+	rm -R -f ./"$APP".AppDir/.junest/usr/share/fonts/*
+	rm -R -f ./"$APP".AppDir/.junest/usr/share/gir-1.0
+	rm -R -f ./"$APP".AppDir/.junest/usr/share/git*
+	rm -R -f ./"$APP".AppDir/.junest/usr/share/ibus/dicts/emoji*
+	rm -R -f ./"$APP".AppDir/.junest/usr/share/info
+	rm -R -f ./"$APP".AppDir/.junest/usr/share/pacman
 	rm -R -f ./"$APP".AppDir/.junest/usr/lib/python*/__pycache__/* # if python is installed, removing this directory can save several megabytes
-	#rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM-* # included in the compilation phase, can sometimes be excluded for daily use
+	#rm -R -f ./"$APP".AppDir/.junest/usr/lib/libLLVM* # included in the compilation phase, can sometimes be excluded for daily use
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib/libgo.so*
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib/libgphobos.so*
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib/libjavascript*
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib/libwebkit*
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib/perl*
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib32/*.a
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib32/libgo.so*
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib32/libgphobos.so*
+	rm -R -f ./"$APP".AppDir/.junest/usr/lib/systemd
 }
 
 function _enable_mountpoints_for_the_inbuilt_bubblewrap() {
-	mkdir -p ./$APP.AppDir/.junest/home
-	mkdir -p ./$APP.AppDir/.junest/media
-	mkdir -p ./$APP.AppDir/.junest/usr/lib/locale
-	mkdir -p ./$APP.AppDir/.junest/usr/share/fonts
-	mkdir -p ./$APP.AppDir/.junest/usr/share/themes
-	mkdir -p ./$APP.AppDir/.junest/run/user
-	mkdir -p ./$APP.AppDir/.junest/usr/lib/xorg
-	mkdir -p ./$APP.AppDir/.junest/usr/share/xorg
-	mkdir -p ./$APP.AppDir/.junest/usr/share/X11
+	mkdir -p ./"$APP".AppDir/.junest/home
+	mkdir -p ./"$APP".AppDir/.junest/media
+	mkdir -p ./"$APP".AppDir/.junest/usr/lib/locale
+	mkdir -p ./"$APP".AppDir/.junest/usr/share/fonts
+	mkdir -p ./"$APP".AppDir/.junest/usr/share/themes
+	mkdir -p ./"$APP".AppDir/.junest/run/media
+	mkdir -p ./"$APP".AppDir/.junest/run/user
+	rm -f ./"$APP".AppDir/.junest/etc/localtime && touch ./"$APP".AppDir/.junest/etc/localtime
+	[ ! -f ./"$APP".AppDir/.junest/etc/asound.conf ] && touch ./"$APP".AppDir/.junest/etc/asound.conf
 }
 
 _rsync_main_package
 _rsync_dependences
 _remove_more_bloatwares
+find ./"$APP".AppDir/.junest/usr/lib ./"$APP".AppDir/.junest/usr/lib32 -type f -regex '.*\.a' -exec rm -f {} \;
+find ./"$APP".AppDir/.junest/usr -type f -regex '.*\.so.*' -exec strip --strip-debug {} \;
+find ./"$APP".AppDir/.junest/usr/bin -type f ! -regex '.*\.so.*' -exec strip --strip-unneeded {} \;
 _enable_mountpoints_for_the_inbuilt_bubblewrap
 
 # CREATE THE APPIMAGE
 if test -f ./*.AppImage; then
 	rm -R -f ./*archimage*.AppImage
 fi
-ARCH=x86_64 VERSION=$(./appimagetool -v | grep -o '[[:digit:]]*') ./appimagetool -s ./"$APP".AppDir
-mv ./*AppImage ./"$(cat ./"$APP".AppDir/*.desktop | grep 'Name=' | head -1 | cut -c 6- | sed 's/ /-/g')"_"$VERSION"-archimage3.4.4-x86_64.AppImage
+ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 1 \
+	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|Bottles-appimage|continuous|*x86_64.AppImage.zsync" \
+	./"$APP".AppDir ./Bottles-"$VERSION"-archimage4-x86_64.AppImage
