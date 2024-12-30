@@ -11,9 +11,14 @@ faudio flac freetype2 fvs \
 gamemode gamemode gnutls gtk3 \
 ibus imagemagick \
 lame \
-lib32-alsa-lib lib32-alsa-lib lib32-alsa-plugins lib32-freetype2 lib32-gamemode lib32-gcc-libs lib32-giflib lib32-glibc lib32-gnutls lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libpulse lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-pipewire lib32-sdl2 lib32-v4l-utils lib32-vkd3d lib32-vkd3d lib32-vulkan-icd-loader lib32-vulkan-mesa-layers lib32-wayland \
+lib32-alsa-lib lib32-alsa-lib lib32-alsa-plugins lib32-freetype2 lib32-gamemode lib32-gcc-libs lib32-giflib lib32-glibc lib32-gnutls \
+lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libpulse \
+lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-pipewire lib32-sdl2 lib32-v4l-utils \
+lib32-vkd3d lib32-vkd3d lib32-vulkan-icd-loader lib32-vulkan-mesa-layers lib32-wayland \
+lib32-libxext lib32-libcups lib32-openssl lib32-bzip2 lib32-libxcrypt lib32-libx11 lib32-libxcb lib32-libxau lib32-harfbuzz lib32-libxdmcp \
+lib32-brotli lib32-libidn2 lib32-libxi lib32-libxfixes lib32-libxxf86vm lib32-libxrender lib32-libtasn1 lib32-p11-kit lib32-nettle lib32-glib2 \
 libasyncns libgirepository libibus libjpeg-turbo libogg libpng libpulse libpulse librsvg libsndfile libva libvorbis libxslt \
-mpg123 mpg123 \
+mpg123 \
 openal opus patool \
 pipewire pipewire procps-ng pulseaudio pulseaudio pulseaudio-alsa \
 python python-gobject python-yaml \
