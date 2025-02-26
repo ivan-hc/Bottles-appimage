@@ -125,7 +125,7 @@ The script "conty.sh" (4) is the big one among the elements of this AppImage.
 ---------------------------------
 
 ## Download
-You can download the latest AppImage from https://github.com/ivan-hc/Bottles-appimage/releases/tag/continuous
+You can download the latest AppImage from https://github.com/ivan-hc/Bottles-appimage/releases/latest
 
 ---------------------------------
 
