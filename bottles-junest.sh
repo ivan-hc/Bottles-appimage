@@ -281,8 +281,8 @@ _JUNEST_CMD() {
 EXEC=$(grep -e '^Exec=.*' "${HERE}"/*.desktop | head -n 1 | cut -d "=" -f 2- | sed -e 's|%.||g')
 
 case "$1" in
-	'') _JUNEST_CMD -- bottles;;
-	*) _JUNEST_CMD -- bottles-cli "$@";;
+	'') _JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles;;
+	*) _JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles-cli "$@";;
 esac
 
 HEREDOC
