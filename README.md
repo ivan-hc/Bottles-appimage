@@ -29,9 +29,7 @@ The official Bottles package is only available as a Flatpak.
 
 All build methods are based on the unofficial AUR package, at https://aur.archlinux.org/packages/bottles
 
-**Any complaints are due to this mental closure only!**
-
-As a packager I can only go by what I upstream or unofficial developers gave to me.
+**As a packager I can only go by what I upstream or unofficial developers gave to me.**
 
 ---------------------------------
 
@@ -42,7 +40,7 @@ Developers and packagers are two completely opposite categories:
 
 The developer certainly has an interest in seeing his application work everywhere, so if a package works or not on a platform, it is the responsibility of the packager to make it compatible.
 
-The biggest obstacle in the Bottles project are some collaborators who, in order to support Flatpak as the only packaging format, give a firm NO to every request or proposal to use an alternative packaging format. Having met some of these arrogant people has served as an incentive to continue doing the opposite of what they said.
+The biggest obstacle in the Bottles project are some collaborators who, in order to support Flatpak as the only packaging format, give a firm NO to every request or proposal to use an alternative packaging format. Having met some of them has served as an incentive to continue doing the opposite of what they said.
 
 I thank the developer of Bottles, @mirkobrombin, for helping me build the AppImage after many attempts by telling me tips and tricks. Grazie Mirko!
 
