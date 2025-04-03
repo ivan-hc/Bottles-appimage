@@ -2,9 +2,9 @@
 
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-lib32_pkgs="lib32-alsa-lib lib32-alsa-plugins lib32-giflib lib32-gnutls \
+lib32_pkgs="lib32-alsa-lib lib32-alsa-plugins lib32-gamemode lib32-giflib lib32-gnutls \
 lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-sdl2 lib32-v4l-utils lib32-vkd3d"
-DEPENDENCES="7zip alsa-lib ibus libibus libportal libpulse nss-mdns pipewire procps-ng xterm $lib32_pkgs" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
+DEPENDENCES="7zip alsa-lib gamemode ibus libibus libportal libpulse nss-mdns pipewire procps-ng xterm $lib32_pkgs" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
 BASICSTUFF="binutils debugedit gzip"
 COMPILERS="base-devel"
 
@@ -346,7 +346,7 @@ _extract_package() {
 			tar fx "$pkg_full_path" -C ./deps/ --warning=no-unknown-keyword
 			echo "$pkgname" >> ./packages
 		fi
-		[ -n "$lib_browser_launcher" ] && [[ "$arg" =~ (hicolor-icon-theme|xterm|xapp|python|python-gobject|python-pycurl|procps-ng|patool|p7zip|libportal|imagemagick|icoextract|cabextract|7zip) ]] && tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword --exclude='.PKGINFO'
+		[ -n "$lib_browser_launcher" ] && [[ "$arg" =~ (hicolor-icon-theme|xterm|xapp|python|python-gobject|python-pycurl|procps-ng|patool|p7zip|libportal|imagemagick|icoextract|gamemode|cabextract|7zip) ]] && tar fx "$pkg_full_path" -C ./base/ --warning=no-unknown-keyword --exclude='.PKGINFO'
 	fi
 }
 
