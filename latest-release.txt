@@ -1,1 +1,1 @@
-https://github.com/ivan-hc/Bottles-appimage/releases/download/51.21-2/Bottles_51.21-2-archimage4.3-x86_64.AppImage
+https://github.com/ivan-hc/Bottles-appimage/releases/download/51.21-3/Bottles_51.21-3-archimage4.3-x86_64.AppImage
