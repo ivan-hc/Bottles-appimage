@@ -1,2 +1,2 @@
 https://github.com/ivan-hc/Bottles-appimage/releases/download/51.21-3/Bottles_51.21-3-archimage4.3-x86_64.AppImage
-Sun Jul 13 01:40:22 UTC 2025
+Mon Jul 14 01:27:25 UTC 2025
