@@ -4,7 +4,7 @@ APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
 lib32_pkgs="lib32-alsa-lib lib32-alsa-plugins lib32-gamemode lib32-giflib lib32-gnutls \
 lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-sdl2 lib32-v4l-utils lib32-vkd3d"
-DEPENDENCES="7zip alsa-lib gamemode ibus libibus libportal libpulse nss-mdns pipewire procps-ng xterm $lib32_pkgs" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
+DEPENDENCES="7zip alsa-lib gamemode ibus libfyaml libibus libportal libpulse nss-mdns pipewire procps-ng xterm $lib32_pkgs" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
 BASICSTUFF="binutils debugedit gzip"
 COMPILERS="base-devel"
 
@@ -18,7 +18,7 @@ lib_audio_keywords="alsa jack pipewire pulse"
 lib_browser_launcher="gio-launch-desktop libasound.so libatk-bridge libatspi libcloudproviders libdb- libdl.so libedit libepoxy libgtk-3.so.0 libjson-glib libnssutil libpthread.so librt.so libtinysparql libwayland-cursor libX11-xcb.so libxapp-gtk3-module.so libXcursor libXdamage libXi.so libxkbfile.so libXrandr p11 pk"
 LIBSAVED="gdk-pixbuf gio girepository ibus idna libadwaita libFLAC libGL.so libgtk- libibus liblzo \
 libxmlb.so libmp3lame libnss_mdns libproxy libstemmer.so libvorbis ordlookup pefile urllib vkbasalt \
-libportal.so libSDL libXaw libSM $lib_audio_keywords $lib_browser_launcher"
+libportal.so libSDL libXaw libSM libfyaml $lib_audio_keywords $lib_browser_launcher"
 
 [ -n "$lib_browser_launcher" ] && DEPENDENCES="$DEPENDENCES xapp hicolor-icon-theme"
 
