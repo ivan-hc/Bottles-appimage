@@ -458,6 +458,8 @@ _remove_more_bloatwares() {
 	for r in $LIB_REMOVED; do rm -Rf AppDir/.junest/usr/lib/"$r"*; done
 	for r in $PYTHON_REMOVED; do rm -Rf AppDir/.junest/usr/lib/python*/"$r"*; done
 	for r in $SHARE_REMOVED; do rm -Rf AppDir/.junest/usr/share/"$r"*; done
+	LIB32_REMOVED="libgo.so"
+	for r in $LIB32_REMOVED; do rm -Rf AppDir/.junest/usr/lib32/"$r"*; done
 	echo Y | rm -Rf AppDir/.cache/yay/*
 	find AppDir/.junest/usr/share/doc/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL DOCUMENTATION NOT RELATED TO THE APP
 	find AppDir/.junest/usr/share/locale/*/*/* -not -iname "*$BIN*" -a -not -name "." -delete 2> /dev/null #REMOVE ALL ADDITIONAL LOCALE FILES
