@@ -500,9 +500,10 @@ if test -f ./*.AppImage; then rm -Rf ./*archimage*.AppImage; fi
 APPNAME=$(cat AppDir/*.desktop | grep '^Name=' | head -1 | cut -c 6- | sed 's/ /-/g')
 REPO="Bottles-appimage"
 TAG="latest"
-VERSION="$VERSION"
 UPINFO="gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|$REPO|$TAG|*x86_64.AppImage.zsync"
+
 echo "$VERSION" > ./version
+
 _appimagetool() {
 	if ! command -v appimagetool 1>/dev/null; then
 		if [ ! -f ./appimagetool ]; then
