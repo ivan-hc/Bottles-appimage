@@ -98,10 +98,7 @@ export NVIDIA_ON=1
 # AppRun footer, here you can add options and change the way the AppImage interacts with its internal structure
 cat <<-'HEREDOC' >> AppDir/AppRun
 
-case "$1" in
-	'') _JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles;;
-	*) _JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles-cli "$@";;
-esac
+_JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles "$@" || _JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles-cli "$@"
 
 HEREDOC
 chmod a+x AppDir/AppRun
