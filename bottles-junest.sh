@@ -125,7 +125,7 @@ echo "$VERSION" > ./version
 _appimagetool() {
 	if ! command -v appimagetool 1>/dev/null; then
 		if [ ! -f ./appimagetool ]; then
-			echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
+			echo " Downloading appimagetool..." && curl -#Lo appimagetool https://github.com/pkgforge-dev/appimagetool-uruntime/releases/download/continuous/appimagetool-"$ARCH".AppImage && chmod a+x ./appimagetool || exit 1
 		fi
 		./appimagetool "$@"
 	else
