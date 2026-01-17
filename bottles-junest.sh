@@ -2,9 +2,10 @@
 
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-lib32_pkgs="lib32-alsa-lib lib32-alsa-plugins lib32-gamemode lib32-giflib lib32-gnutls \
-lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-v4l-utils lib32-vkd3d"
-DEPENDENCES="cabextract dconf freetype2 gamemode icoextract imagemagick $lib32_pkgs libpulse libunwind mesa patool pipewire procps-ng vkbasalt xterm" #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
+bottles_deps="cabextract dconf freetype2 gamemode icoextract imagemagick libpulse libunwind mesa patool pipewire procps-ng vkbasalt xterm"
+lib32_pkgs="lib32-alsa-lib lib32-alsa-plugins lib32-gamemode lib32-giflib lib32-gnutls lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-v4l-utils lib32-vkd3d"
+vulkan_pkgs="libdisplay-info libdrm libxcb libxshmfence llvm-libs spirv-tools vulkan-asahi vulkan-gfxstream vulkan-icd-loader vulkan-intel vulkan-mesa-implicit-layers vulkan-nouveau vulkan-radeon vulkan-swrast vulkan-tools vulkan-virtio"
+DEPENDENCES=$(echo "$bottles_deps $lib32_pkgs $vulkan_pkgs" | tr ' ' '\n' | sort -u | xargs) #SYNTAX: "APP1 APP2 APP3 APP4...", LEAVE BLANK IF NO OTHER DEPENDENCIES ARE NEEDED
 BASICSTUFF="binutils debugedit gzip"
 COMPILERS="base-devel"
 
@@ -98,7 +99,7 @@ export NVIDIA_ON=1
 # AppRun footer, here you can add options and change the way the AppImage interacts with its internal structure
 cat <<-'HEREDOC' >> AppDir/AppRun
 
-_JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles "$@" || _JUNEST_CMD -- "$JUNEST_HOME"/usr/bin/bottles-cli "$@"
+_JUNEST_CMD -- /usr/bin/bottles "$@" || _JUNEST_CMD -- /usr/bin/bottles-cli "$@"
 
 HEREDOC
 chmod a+x AppDir/AppRun
