@@ -11,9 +11,7 @@ This AppImage is a new generation one, so you don't need `libfuse2` installed on
 
 [Motivation](#motivation)
 
-[Construction methods](#construction-methods)
- - [JuNest](#junest)
- - [Conty (old method)](#conty)
+[Construction method](#construction-method)
 
 [Download](#download)
 
@@ -46,20 +44,7 @@ I thank the developer of Bottles, @mirkobrombin, for helping me build the AppIma
 
 ---------------------------------
 
-## Construction methods
-I have tried many times to allow non-Flatpak users to use Bottles in an alternative way, and not without difficulty.
-
-There are currently two main methods supported in this repository, and both are based on a portable Arch Linux containers: [JuNest](https://github.com/fsquillace/junest) and [Conty](https://github.com/Kron4ek/Conty)
-
-**As of January 26, 2025, JuNest has replaced Conty as the base.** In short:
-- to compile Conty you need root privileges, in case of errors you have to repeat the whole process from the beginning and cleaning up unnecessary files is much more difficult. You can extract the container, but you can't test the changes on the fly nor can you regroup it easily.
-- on the contrary, JuNest is a rootless solution, in case of errors while compiling you can resume from a specific point, finally, you can choose to include everything or only what is necessary. The final AppImages are therefore smaller and easier to analyze, as well as quick to extract and repackage in a few seconds.
-
-Between the two, the most powerful solution is definitely Conty, but it is not suitable to be assembled in an AppImage, also because Conty is a real filesystem, like AppImages, and the result is that the application is mounted twice. JuNest is lighter and more flexible instead.
-
----------------------------------
-
-### JuNest
+## Construction method
 
 JuNest, at https://github.com/fsquillace/junest, is an Arch Linux container that can integrate with the host system using three modes: BubbleWrap (uses Linux Namespaces), PROOT (the most portable) and CHROOT.
 
@@ -85,40 +70,9 @@ Points 1, 2 and 3 are the essential elements of any AppImage.
 
 The directory named ".junest" contains the structure of the Arch Linux filesystem, or better, that part needed to made the app working as it should.
 
-JuNest is unmatched in flexibility, as you can extract the AppImage and remove files, or add new ones, simply by extracting an Arch Linux package into the .junest directory, then running the AppRun. And when you're done testing, you can export the directory back into an AppImage. The support for hardware acceleration in Archimages instead is also thanks to the developer of Conty, who contributed a lot too. In fact, both Conty and Archimage can share the same directory for drivers.
+JuNest is unmatched in flexibility, as you can extract the AppImage and remove files, or add new ones, simply by extracting an Arch Linux package into the .junest directory, then running the AppRun. And when you're done testing, you can export the directory back into an AppImage. The support for hardware acceleration in Archimages instead is also thanks to the developer of [Conty](https://github.com/Kron4ek/Conty), who contributed a lot too.
 
 **For more details on how to create your own Archimages, visit https://github.com/ivan-hc/ArchImage**
-
----------------------------------
-
-### Conty
-
-Conty, at https://github.com/Kron4ek/Conty, has long been the primary method for creating Bottles and Steam AppImage packages. Its replacement occurred only because it is less easy to manage, both as a simple AppImage and as an application in itself, to be "shrinked". But if you want to use it as an alternative to an AppImage, it is a great independent solution.
-
-<details>
-  <summary>Click here to know more about the Conty-based AppImage</summary>
-
-While JuNest is just a set of files, Conty is a full-fledged filesystem, and requires root privileges to build, ensuring its security **for its use case**.
-
-On the contrary of JuNest, Conty has builtin functions able to recognize and compile Nvidia drivers on the fly if a user needs them.
-
-This is the content of a Conty-based AppImage:
-```
-|---- AppRun
-|---- com.usebottles.bottles.desktop
-|---- com.usebottles.bottles.svg
-|---- conty.sh
-```
-1. The AppRun is the core script of the AppImage
-2. The .desktop file of Bottles
-3. The icon of Bottles
-4. The Arch Linux container named "conty.sh", it contains Bottles, WINE and grafic drivers
-
-Points 1, 2 and 3 are the essential elements of any AppImage.
-
-The script "conty.sh" (4) is the big one among the elements of this AppImage.
-
-</details>
 
 ---------------------------------
 
