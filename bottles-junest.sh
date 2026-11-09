@@ -13,7 +13,7 @@ COMPILERS="base-devel"
 # Set keywords to searchan include in names of directories and files in /usr/bin (BINSAVED), /usr/share (SHARESAVED) and /usr/lib (LIBSAVED)
 BINSAVED="python ibus xdpyinfo"
 SHARESAVED="alsa"
-LIBSAVED="python Gio GLib GModule GObject Gtk Adw Xdp Gsk Graphene Gdk IBus ibus cairo PangoCairo Pango HarfBuzz freetype2 freetype2 librsvg gdk-pixbuf ntdll libunwind libvulkan libmp3lame libFLAC libvorbis Secret"
+LIBSAVED="python Gio GLib GModule GObject Gtk Adw Xdp Gsk Graphene Gdk IBus ibus cairo PangoCairo Pango HarfBuzz freetype2 freetype2 librsvg gdk-pixbuf ntdll libunwind libvulkan libmp3lame libFLAC libvorbis Secret libGL"
 
 # Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usr/lib/python*/ and /usr/share/ respectively.
 # The "rm" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
