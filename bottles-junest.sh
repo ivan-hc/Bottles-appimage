@@ -2,7 +2,7 @@
 
 APP=bottles
 BIN="$APP" #CHANGE THIS IF THE NAME OF THE BINARY IS DIFFERENT FROM "$APP" (for example, the binary of "obs-studio" is "obs")
-bottles_deps="cabextract dconf freetype2 fvs2 gamemode icoextract imagemagick libpulse libunwind libxaw mesa patool pipewire procps-ng vkbasalt xterm"
+bottles_deps="cabextract dconf freetype2 fvs2 gamemode icoextract imagemagick libpulse libsecret libunwind libxaw mesa patool pipewire procps-ng vkbasalt xterm"
 lib32_pkgs="lib32-alsa-lib lib32-alsa-plugins lib32-gamemode lib32-giflib lib32-gnutls lib32-gst-plugins-base lib32-gst-plugins-good lib32-gtk3 lib32-libjpeg-turbo lib32-libldap lib32-libpng lib32-libpulse lib32-libva lib32-libxcomposite lib32-libxinerama lib32-libxslt lib32-mpg123 lib32-openal lib32-v4l-utils lib32-vkd3d"
 lib32_vulkan_pkgs="lib32-vulkan-gfxstream lib32-vulkan-icd-loader lib32-vulkan-intel lib32-vulkan-mesa-implicit-layers lib32-vulkan-nouveau lib32-vulkan-radeon lib32-vulkan-swrast lib32-vulkan-virtio"
 vulkan_pkgs="libdisplay-info libdrm libxcb libxshmfence llvm-libs spirv-tools vkd3d vulkan-gfxstream vulkan-icd-loader vulkan-intel vulkan-mesa-implicit-layers vulkan-nouveau vulkan-radeon vulkan-swrast vulkan-tools vulkan-virtio"
@@ -13,7 +13,7 @@ COMPILERS="base-devel"
 # Set keywords to searchan include in names of directories and files in /usr/bin (BINSAVED), /usr/share (SHARESAVED) and /usr/lib (LIBSAVED)
 BINSAVED="python ibus xdpyinfo"
 SHARESAVED="alsa"
-LIBSAVED="python Gio GLib GModule GObject Gtk Adw Xdp Gsk Graphene Gdk IBus ibus cairo PangoCairo Pango HarfBuzz freetype2 freetype2 librsvg gdk-pixbuf ntdll libunwind libvulkan libmp3lame libFLAC libvorbis"
+LIBSAVED="python Gio GLib GModule GObject Gtk Adw Xdp Gsk Graphene Gdk IBus ibus cairo PangoCairo Pango HarfBuzz freetype2 freetype2 librsvg gdk-pixbuf ntdll libunwind libvulkan libmp3lame libFLAC libvorbis Secret"
 
 # Set the items you want to manually REMOVE. Complete the path in /etc/, /usr/bin/, /usr/lib/, /usr/lib/python*/ and /usr/share/ respectively.
 # The "rm" command will take into account the listed object/path and add an asterisk at the end, completing the path to be removed.
